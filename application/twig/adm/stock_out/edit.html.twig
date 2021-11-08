@@ -1,0 +1,173 @@
+{% extends 'adm/layout.html.twig' %}
+
+{% block content %}
+
+<div class="content-wrapper" id="vue-edit">
+
+	<form class="edit-form" method="POST" action="{{ site_url('adm/stock_out/save') }}">
+	
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h4>{{ content_title }}</h4>
+				</div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item">Beranda</li>
+						<li class="breadcrumb-item">Stok</li>
+						<li class="breadcrumb-item"><a href="#">Keluar</a></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+
+		<div class="container-fluid">
+
+			<div class="row">
+
+				<div class="col-md-12">
+
+					<div class="card card-default">
+						
+						<div class="card-body">
+							<div class="row">
+								<div class="col-md-3">
+									<div class="form-group">
+										<input type="hidden" class="form-control" name="id" id="id" value="{{ id }}">
+
+										<label class="control-label">Nomor</label>
+										<input type="text" class="form-control" name="number" tabindex="1"
+											value="{{ autonumber }}" required="required" readonly="readonly" style="background-color:transparent">
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="form-group">
+										<label>Tanggal</label>
+										<input type="date" class="form-control" name="date" tabindex="2" value="{{ check_array_key(header_data, 'date') }}" required="required">
+									</div>
+								</div>
+
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+
+			<div class="row">
+				<div class="col-12">
+					<div class="card">
+						<div class="card-header">
+							<!-- <h3 class="card-title">List Material</h3> -->
+								
+								<button type="button" class="btn btn-primary" @click="detailAdd">
+									Tambah Item
+								</button>
+											
+								<button type="button" class="btn btn-danger" @click="detailDelete">
+									Hapus Item
+								</button>
+						</div>
+
+						<div class="card-body table-responsive p-0" style="max-height: 400px;">
+							<table class="table table-head-fixed table-borderless text-nowrap" id="edit-table">
+								<thead>
+									<tr class="bg-light">
+										<th align="left" class="fit-width">
+											<input class="check-all" type="checkbox">
+										</th>
+										<th align="left" class="fit-width">Nama Barang</th>
+										<th align="left" class="fit-width">Kamar</th>
+										<th align="left" class="fit-width">Quantity</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(row, detail_idx) in detailData">
+										<td class="fit-width col-1">
+											<input class="check-sub" type="checkbox" v-bind:value="detail_idx">
+										</td>
+										<td width="40%">
+											<% row.name %>
+										</td>
+										<td width="30%" class="bg-yellow" align="right">
+											<input type="text" class="form-control currency-mask" style="width:100%;" v-model="row.room">
+										</td>
+										<td width="30%" class="bg-yellow" align="right">
+											<input type="hidden" class="form-control currency-mask" style="width:100%;" v-model="row.stock">
+											<input type="text" class="form-control currency-mask" style="width:100%;" v-model="row.quantity" @keyup="handleQty(row)">
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="card-footer">
+
+							<div class="form-group">
+								<label class="control-label">Keterangan</label>
+								<textarea class="form-control" name="description" rows="6">{{ check_array_key(header_data, 'description') }}</textarea>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+
+				<div class="col-md-12">
+
+					<div class="card card-default col-md-2 float-right">
+						
+						<div class="card-body">
+							<div class="row">
+								<div class="col-md-12">
+									<button type="submit" class="btn btn-success float-right" style="width: 100%;">
+									Simpan
+								</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+		 	
+		</div>
+
+	</section>
+	<!-- /.content -->
+
+	</form>
+
+</div>
+
+<div class="modal fade edit-modal" id="modal-default">
+	<div class="modal-dialog modal-xs">
+		<div class="modal-content edit-modal-content">
+			Loading...
+		</div>
+	</div>
+</div>
+
+{% endblock  %}
+
+{% block add_javascript %}
+{{ parent() }}
+
+
+<script type="text/javascript" src="{{ assets_url('assets/js/app/stock_out/edit.js?') }}"></script>
+
+<script type="text/javascript">
+	window.FORM_EDIT.handleVue();
+	window.INPUT.handleSelect2();
+</script>
+{% endblock  %}

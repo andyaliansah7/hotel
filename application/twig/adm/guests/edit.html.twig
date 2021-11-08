@@ -1,0 +1,75 @@
+<form class="master-form" action="{{ site_url('adm/guests/save') }}" method="POST">
+
+	<div class="modal-header">
+		<h5 class="modal-title">{{ content_title }}</h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+
+	<div class="modal-body">
+		<input class="form-control" name="id" value="{{ id }}" type="hidden">
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Nomor Identitas</label>
+					<input type="text" class="form-control" id="namecheck" name="identity_number" tabindex="1" placeholder="3200000089091234"
+						value="{{ check_array_key(get_data, 'guest_identity_number') }}">
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Nama Lengkap</label>
+					<input type="text" class="form-control" name="name" tabindex="2" placeholder="Mr. Aleen Smitham"
+						value="{{ check_array_key(get_data, 'guest_name') }}">
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Telepon</label>
+					<input type="text" class="form-control" name="phone" tabindex="3" placeholder="0811 0000 2345"
+						value="{{ check_array_key(get_data, 'guest_phone') }}">
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Alamat</label>
+					<textarea class="form-control" name="address" tabindex="4" placeholder="Weber Vista Gulgowskiburgh, DE 48529">{{ check_array_key(get_data, 'guest_address') }}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default waves-effect master-cancel" data-dismiss="modal">Batal</button>
+
+		<div class="btn-group" role="group">
+	        <button name="action" value="save" class="btn btn-primary btn-save" type="submit">
+	        	Simpan
+	        </button>
+	        <button type="button" class="btn btn-primary btn-save dropdown-toggle" data-toggle="dropdown"
+	        	aria-haspopup="true" aria-expanded="false">
+	        </button>
+			<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+				<!-- <a class="dropdown-item" href="#">Dropdown link</a> -->
+				<button class="dropdown-item" name="action" value="save_new" type="submit" href="#">Simpan &amp; Baru</button>
+				<button class="dropdown-item" name="action" value="save_close" type="submit" href="#">Simpan &amp; Tutup</button>
+			</div>
+		</div>
+	</div>
+
+</form>
+
+<script type="text/javascript">
+
+	var elDivID = "#namecheck";
+	var elResult = ".result_check";
+	var elUrl = "{{ site_url('adm/guests/check_id') }}";
+	var elBtn = ".btn-save";
+
+	window.FORM.handleCheckField2(elDivID, elResult, elUrl, elBtn, "", "");
+	window.INPUT.handleSelect2();
+
+</script>

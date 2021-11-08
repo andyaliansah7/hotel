@@ -1,0 +1,787 @@
+{% extends 'adm/layout.html.twig' %}
+{% block add_css %}
+{{ parent() }}
+<style type="text/css">
+	@media print {
+		@page {
+			size: a4 landscape;
+		}
+	}
+	
+	/* .wrap-header {} */
+
+	.wrap-footer {
+		page-break-inside: avoid;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="content-wrapper" id="vue-master">
+
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h4>{{ content_title }}</h4>
+				</div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item">Beranda</li>
+						<li class="breadcrumb-item">Laporan</li>
+						<li class="breadcrumb-item"><a href="#">Room Count Sheet</a></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+
+				<div class="col-md-12">
+
+					<div class="card card-default">
+						<!-- <div class="card-header">
+							<h3 class="card-title">Data</h3>
+						</div> -->
+						<div class="card-body">
+
+							<div class="row">
+
+								<div class="col-md-3">
+									<div class="form-group">
+										<label>Dari Tanggal</label>
+											<input type="date" class="form-control date_1" tabindex="3">
+									</div>
+								</div>
+
+								{# <div class="col-md-3">
+									<div class="form-group">
+										<label>Sampai Tanggal</label>
+											<input type="date" class="form-control date_2" tabindex="4">
+									</div>
+								</div> #}
+
+							</div>
+							
+							<div class="btn-group float-right" role="group" aria-label="Basic example" style="width: 30%;">
+								<button class="btn btn-primary float-right" style="width: 100%;" id="button-print">
+									<i class="fas fa-print"></i> &nbsp; Print
+								</button>
+								<button class="btn btn-warning float-right" style="width: 100%;" @click="getData()">
+									<i class="fas fa-sync-alt"></i> &nbsp; Proses
+								</button>
+							</div>
+
+							{# <button class="btn btn-info float-right" style="width: 10%; margin-left: .5%;" @click="getData()">
+								<i class="fas fa-sync-alt"></i> &nbsp; Proses
+							</button>
+
+							<div class="btn-group float-right" role="group" aria-label="Basic example" style="width: 30%;">
+								<button class="btn btn-success float-right" style="width: 100%;" id="button-print">
+									<i class="fas fa-print"></i> &nbsp; Print
+								</button>
+								<button class="btn btn-success float-right" style="width: 100%;" @click="exportExcel()">
+									<i class="far fa-file-excel"></i> &nbsp; Export Excel
+								</button>
+							</div> #}
+						</div>
+					</div>
+
+					<div class="card card-default">
+						<div class="card-body" id="master-content">
+
+							<div class="wrap-header">
+								<h2 align="left">Room Count Sheet</h2>
+
+							<table style="font-size: 15px;" v-if="detailData.length != 0">
+								<tr>
+									<td>Tanggal</td>
+									<td style="width: 3%;">:</td>
+									<td><% date_1 %></td>
+								</tr>
+							</table>
+							<br/>
+
+							<label>Shift 1 (07.00 - 15.00)</label>
+							<table class="table table-bordered table-sm" style="font-size: 15px; width:100%;">
+								<thead>
+									<tr class="bg-light">
+										<th width="1%">
+											No.
+										</th>
+										<th width="10%">
+											Petugas FO
+										</th>
+										<th width="9%">
+											Room Number
+										</th>
+										<th width="15%">
+											Name
+										</th>
+										<th width="5%">
+											Extra Bed
+										</th>
+										<th width="5%">
+											Room Pax
+										</th>
+										<th width="10%">
+											Arrival Date
+										</th>
+										<th width="10%">
+											Departure Date
+										</th>
+										<th width="15%">
+											Room Date Before Disc.
+										</th>
+										<th width="10%">
+											Discount
+										</th>
+										<th width="15%">
+											Room Date After Disc.
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(row, detail_idx) in detailData" v-if="detailData.length > 0">
+										<td>
+											<% row.no %>
+										</td>
+										<td>
+											<% row.user %>
+										</td>
+										<td>
+											<% row.room_number %>
+										</td>
+										<td>
+											<% row.guest %>
+										</td>
+										<td align="right">
+											<% row.extra_bed_room %>
+										</td>
+										<td align="right">
+											<% row.room_pax %>
+										</td>
+										<td>
+											<% row.arrival_date %>
+										</td>
+										<td>
+											<% row.departure_date %>
+										</td>
+										<td align="right">
+											<% row.room_rate %>
+										</td>
+										<td align="right">
+											<% row.discount %>
+										</td>
+										<td align="right">
+											<% row.room_rate_discount %>
+										</td>
+									</tr>
+								</tbody>
+								<tbody v-if="detailData.length == 0">
+									<tr>
+										<td colspan="11">
+											Tidak ada data yang tersedia pada tabel ini
+										</td>
+									</tr>
+								</tbody>
+								<tfoot class="bold">
+									<tr class="bg-light">
+										<td align="right" colspan="4">
+											Occupaid
+										</td>
+										<td align="right">
+											<% total_extra_bed_1 %>
+										</td>
+										<td align="right">
+											<% total_pax_1 %>
+										</td>
+										<td align="right" colspan="2">
+
+										</td>
+										<td align="right">
+											<% total_room_rate_1 %>
+										</td>
+										<td align="right">
+											<% total_discount_1 %>
+										</td>
+										<td align="right">
+											<% total_room_rate_discount_1 %>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+							<br/>
+
+							<label>Shift 2 (15.00 - 23.00)</label>
+							<table class="table table-bordered table-sm" style="font-size: 15px; width:100%;">
+								<thead>
+									<tr class="bg-light">
+										<th width="1%">
+											No.
+										</th>
+										<th width="10%">
+											Petugas FO
+										</th>
+										<th width="9%">
+											Room Number
+										</th>
+										<th width="15%">
+											Name
+										</th>
+										<th width="5%">
+											Extra Bed
+										</th>
+										<th width="5%">
+											Room Pax
+										</th>
+										<th width="10%">
+											Arrival Date
+										</th>
+										<th width="10%">
+											Departure Date
+										</th>
+										<th width="15%">
+											Room Date Before Disc.
+										</th>
+										<th width="10%">
+											Discount
+										</th>
+										<th width="15%">
+											Room Date After Disc.
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(row, detail_idx) in detailData2" v-if="detailData2.length > 0">
+										<td>
+											<% row.no %>
+										</td>
+										<td>
+											<% row.user %>
+										</td>
+										<td>
+											<% row.room_number %>
+										</td>
+										<td>
+											<% row.guest %>
+										</td>
+										<td align="right">
+											<% row.extra_bed_room %>
+										</td>
+										<td align="right">
+											<% row.room_pax %>
+										</td>
+										<td>
+											<% row.arrival_date %>
+										</td>
+										<td>
+											<% row.departure_date %>
+										</td>
+										<td align="right">
+											<% row.room_rate %>
+										</td>
+										<td align="right">
+											<% row.discount %>
+										</td>
+										<td align="right">
+											<% row.room_rate_discount %>
+										</td>
+									</tr>
+								</tbody>
+								<tbody v-if="detailData2.length == 0">
+									<tr>
+										<td colspan="11">
+											Tidak ada data yang tersedia pada tabel ini
+										</td>
+									</tr>
+								</tbody>
+								<tfoot class="bold">
+									<tr class="bg-light">
+										<td align="right" colspan="4">
+											Occupaid
+										</td>
+										<td align="right">
+											<% total_extra_bed_2 %>
+										</td>
+										<td align="right">
+											<% total_pax_2 %>
+										</td>
+										<td align="right" colspan="2">
+
+										</td>
+										<td align="right">
+											<% total_room_rate_2 %>
+										</td>
+										<td align="right">
+											<% total_discount_2 %>
+										</td>
+										<td align="right">
+											<% total_room_rate_discount_2 %>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+							<br/>
+
+							<label>Shift 3 (23.00 - 07.00)</label>
+							<table class="table table-bordered table-sm" style="font-size: 15px; width:100%;">
+								<thead>
+									<tr class="bg-light">
+										<th width="1%">
+											No.
+										</th>
+										<th width="10%">
+											Petugas FO
+										</th>
+										<th width="9%">
+											Room Number
+										</th>
+										<th width="15%">
+											Name
+										</th>
+										<th width="5%">
+											Extra Bed
+										</th>
+										<th width="5%">
+											Room Pax
+										</th>
+										<th width="10%">
+											Arrival Date
+										</th>
+										<th width="10%">
+											Departure Date
+										</th>
+										<th width="15%">
+											Room Date Before Disc.
+										</th>
+										<th width="10%">
+											Discount
+										</th>
+										<th width="15%">
+											Room Date After Disc.
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(row, detail_idx) in detailData3" v-if="detailData3.length > 0">
+										<td>
+											<% row.no %>
+										</td>
+										<td>
+											<% row.user %>
+										</td>
+										<td>
+											<% row.room_number %>
+										</td>
+										<td>
+											<% row.guest %>
+										</td>
+										<td align="right">
+											<% row.extra_bed_room %>
+										</td>
+										<td align="right">
+											<% row.room_pax %>
+										</td>
+										<td>
+											<% row.arrival_date %>
+										</td>
+										<td>
+											<% row.departure_date %>
+										</td>
+										<td align="right">
+											<% row.room_rate %>
+										</td>
+										<td align="right">
+											<% row.discount %>
+										</td>
+										<td align="right">
+											<% row.room_rate_discount %>
+										</td>
+									</tr>
+								</tbody>
+								<tbody v-if="detailData3.length == 0">
+									<tr>
+										<td colspan="11">
+											Tidak ada data yang tersedia pada tabel ini
+										</td>
+									</tr>
+								</tbody>
+								<tfoot class="bold">
+									<tr class="bg-light">
+										<td align="right" colspan="4">
+											Occupaid
+										</td>
+										<td align="right">
+											<% total_extra_bed_3 %>
+										</td>
+										<td align="right">
+											<% total_pax_3 %>
+										</td>
+										<td align="right" colspan="2">
+
+										</td>
+										<td align="right">
+											<% total_room_rate_3 %>
+										</td>
+										<td align="right">
+											<% total_discount_3 %>
+										</td>
+										<td align="right">
+											<% total_room_rate_discount_3 %>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="11">
+											&nbsp;
+										</td>
+									</tr>
+									<tr class="bg-light">
+										<td align="right" colspan="4">
+											Total Occupaid
+										</td>
+										<td align="right">
+											<% total_extra_bed_all %>
+										</td>
+										<td align="right">
+											<% total_pax_all %>
+										</td>
+										<td align="right" colspan="2">
+
+										</td>
+										<td align="right">
+											<% total_room_rate_all %>
+										</td>
+										<td align="right">
+											<% total_discount_all %>
+										</td>
+										<td align="right">
+											<% total_room_rate_discount_all %>
+										</td>
+									</tr>
+								</tfoot>
+
+							</table>
+
+							{# Guest Group #}
+							<table class="table table-bordered table-sm" style="font-size: 15px; width:20%;" align="left">
+								<thead>
+									<tr class="bg-light">
+										<th colspan="2">
+											Room Occ. By Segment
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(row, detail_idx) in detailData4" v-if="detailData4.length > 0">
+										<td>
+											<% row.guest_group %>
+										</td>
+										<td align="right">
+											<% row.total_stay_all %>
+										</td>
+									</tr>
+								</tbody>
+								<tbody v-if="detailData4.length == 0">
+									<tr>
+										<td colspan="2">
+											Tidak ada data yang tersedia pada tabel ini
+										</td>
+									</tr>
+								</tbody>
+								<tfoot class="bold">
+									<tr class="bg-light">
+										<td align="right">
+											Total
+										</td>
+										<td align="right">
+											<% guest_group_total %>
+										</td>
+									<tr class="bg-light">
+										<td align="right">
+											Residence
+										</td>
+										<td align="right">
+											<% guest_group_residence %>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+
+							{# Function Room #}
+							<table class="table table-bordered table-sm" style="font-size: 15px; width:40%;" align="left">
+								<thead>
+									<tr class="bg-light">
+										<th>
+											Function Room
+										</th>
+										<th>
+											Group Event
+										</th>
+										<th>
+											Pax
+										</th>
+										<th>
+											Function Rate
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(row, detail_idx) in detailData5" v-if="detailData5.length > 0">
+										<td>
+											<% row.room_number %>
+										</td>
+										<td>
+											<% row.group_event %>
+										</td>
+										<td align="right">
+											<% row.pax %>
+										</td>
+										<td align="right">
+											<% row.total_extrabed %>
+										</td>
+									</tr>
+								</tbody>
+								<tbody v-if="detailData5.length == 0">
+									<tr>
+										<td colspan="4">
+											Tidak ada data yang tersedia pada tabel ini
+										</td>
+									</tr>
+								</tbody>
+								<tfoot class="bold">
+									<tr class="bg-light">
+										<td align="right" colspan="3">
+											Total
+										</td>
+										<td align="right">
+											<% froom_rate_total %>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+
+							{# Other Revenue #}
+							<table class="table table-bordered table-sm" style="font-size: 15px; width:20%;" align="left">
+								<thead>
+									<tr class="bg-light">
+										<th colspan="2">
+											Other Revenue
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(row, detail_idx) in detailData6" v-if="detailData6.length > 0">
+										<td>
+											<% row.item_name %>
+										</td>
+										<td align="right">
+											<% row.grand_total %>
+										</td>
+									</tr>
+								</tbody>
+								<tbody v-if="detailData6.length == 0">
+									<tr>
+										<td colspan="2">
+											Tidak ada data yang tersedia pada tabel ini
+										</td>
+									</tr>
+								</tbody>
+								<tfoot class="bold">
+									<tr class="bg-light">
+										<td align="right">
+											Total
+										</td>
+										<td align="right">
+											<% trx_total %>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+
+							{# Summary #}
+							<table class="table table-bordered table-sm" style="font-size: 15px; width:20%;" align="left">
+								<thead>
+									<tr class="bg-light">
+										<th colspan="2">
+											Summary
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											Room Saleable
+										</td>
+										<td align="right">
+											<% room_sealeble %>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											Room Occupaid
+										</td>
+										<td align="right">
+											<% room_occupaid %>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											Room Sold
+										</td>
+										<td align="right">
+											<% room_sold %>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											Complimentary
+										</td>
+										<td align="right">
+											<% complimentary %>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											House Use
+										</td>
+										<td align="right">
+											<% house_use %>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											% Occupancy
+										</td>
+										<td align="right">
+											<% percentage_occupancy %> %
+										</td>
+									</tr>
+									<tr>
+										<td>
+											Pax
+										</td>
+										<td align="right">
+											<% pax_summary %>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											Average Room Rate
+										</td>
+										<td align="right">
+											<% avg_room_rate %>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											Average Rate Guest
+										</td>
+										<td align="right">
+											<% avg_rate_guest %>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											Room Rev. Before Disc
+										</td>
+										<td align="right">
+											<% room_rev_before_disc %>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											Room Allowance
+										</td>
+										<td align="right">
+											<% room_allowance %>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											Total Room Revenue
+										</td>
+										<td align="right">
+											<% total_room_revenue %>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											Total Non Room Revenue
+										</td>
+										<td align="right">
+											<% total_non_room_revenue %>
+										</td>
+									</tr>
+								</tbody>
+								<tfoot class="bold">
+									<tr class="bg-light">
+										<td align="right">
+											Total All Revenue
+										</td>
+										<td align="right">
+											<% total_all_revenue %>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+
+
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+			<!-- /.row -->
+		</div><!-- /.container-fluid -->
+	</section>
+	<!-- /.content -->
+
+</div>
+
+{% endblock  %}
+
+{% block add_javascript %}
+{{ parent() }}
+
+<script type="text/javascript">
+	jQuery(function($) {
+
+    // Function available at https://gist.github.com/sixlive/55b9630cc105676f842c
+
+    $.fn.printDiv = function() {
+      var printContents = $(this).html();
+      var originalContents = $('body').html();
+      $('body').html(printContents);
+      $('body').addClass('js-print');
+      window.print();
+      $('body').html(originalContents);
+      $('body').removeClass('js-print');
+    };
+
+    // Print
+    $('#button-print').click(function() {
+      $('#master-content').printDiv();
+      setTimeout(function(){
+        window.close()
+        location.reload();
+      },10);
+    });
+
+  });
+</script>
+
+<script type="text/javascript" src="{{ assets_url('assets/js/app/report/r_shifts.js?') }}"></script>
+<script type="text/javascript">
+	window.REPORT.init();
+	window.DATETIME.initDatePicker();
+	window.INPUT.handleSelect2();
+</script>
+{% endblock  %}

@@ -1,0 +1,259 @@
+{% extends 'adm/layout.html.twig' %}
+{% block add_css %}
+{{ parent() }}
+<style type="text/css">
+	@media print {
+		@page {
+			size: a4 landscape;
+		}
+	}
+	
+	/* .wrap-header {} */
+
+	.wrap-footer {
+		page-break-inside: avoid;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="content-wrapper" id="vue-master">
+
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h4>{{ content_title }}</h4>
+				</div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item">Beranda</li>
+						<li class="breadcrumb-item">Laporan</li>
+						<li class="breadcrumb-item"><a href="#">Grup Tamu</a></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+
+				<div class="col-md-12">
+
+					<div class="card card-default">
+						<!-- <div class="card-header">
+							<h3 class="card-title">Data</h3>
+						</div> -->
+						<div class="card-body">
+
+							<div class="row">
+
+								<div class="col-md-3">
+									<div class="form-group">
+										<label>Dari Tanggal</label>
+											<input type="date" class="form-control date_1" tabindex="3">
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="form-group">
+										<label>Sampai Tanggal</label>
+											<input type="date" class="form-control date_2" tabindex="4">
+									</div>
+								</div>
+
+							</div>
+							
+							<div class="btn-group float-right" role="group" aria-label="Basic example" style="width: 30%;">
+								<button class="btn btn-primary float-right" style="width: 100%;" id="button-print">
+									<i class="fas fa-print"></i> &nbsp; Print
+								</button>
+								<button class="btn btn-warning float-right" style="width: 100%;" @click="getData()">
+									<i class="fas fa-sync-alt"></i> &nbsp; Proses
+								</button>
+							</div>
+
+							{# <button class="btn btn-info float-right" style="width: 10%; margin-left: .5%;" @click="getData()">
+								<i class="fas fa-sync-alt"></i> &nbsp; Proses
+							</button>
+
+							<div class="btn-group float-right" role="group" aria-label="Basic example" style="width: 30%;">
+								<button class="btn btn-success float-right" style="width: 100%;" id="button-print">
+									<i class="fas fa-print"></i> &nbsp; Print
+								</button>
+								<button class="btn btn-success float-right" style="width: 100%;" @click="exportExcel()">
+									<i class="far fa-file-excel"></i> &nbsp; Export Excel
+								</button>
+							</div> #}
+						</div>
+					</div>
+
+					<div class="card card-default">
+						<div class="card-body" id="master-content">
+
+							<div class="wrap-header">
+								<h2 align="left">Grup Tamu</h2>
+
+							<table style="font-size: 12px;" v-if="detailData.length != 0">
+								{# <tr v-if="supplier != '' && supplier != '(Semua)'">
+									<td>Supplier</td>
+									<td style="width: 3%;">:</td>
+									<td><% supplier %></td>
+								</tr> #}
+								{# <tr v-if="date != '' && date != undefined">
+									<td>Tanggal</td>
+									<td style="width: 3%;">:</td>
+									<td><% date %></td>
+								</tr> #}
+							</table>
+							<br/>
+							<table class="table table-bordered" style="font-size: 12px; width:100%;">
+								<thead>
+									<tr class="bg-light">
+										<th style="width: 20%">
+											Grup Tamu
+										</th>
+										<th style="width: 10%">
+											Jumlah Menginap
+										</th>
+										<th style="width: 10%">
+											Kamar
+										</th>
+										<th style="width: 10%">
+											Diskon
+										</th>
+										<th style="width: 10%">
+											Deposit
+										</th>
+										<th style="width: 10%">
+											Makanan & Minuman
+										</th>
+										<th style="width: 10%">
+											Layanan
+										</th>
+										<th style="width: 10%">
+											Total
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(row, detail_idx) in detailData">
+										<td>
+											<% row.guest_group %>
+										</td>
+										<td align="center">
+											<% row.total_stay %>
+										</td>
+										<td align="right">
+											<% row.total_room_price %>
+										</td>
+										<td align="right">
+											<% row.discount %>
+										</td>
+										<td align="right">
+											<% row.deposit %>
+										</td>
+										<td align="right">
+											<% row.consumption %>
+										</td>
+										<td align="right">
+											<% row.service %>
+										</td>
+										<td align="right">
+											<% row.total %>
+										</td>
+									</tr>
+								</tbody>
+								<tbody v-if="detailData.length == 0">
+									<tr>
+										<td colspan="8">
+											Tidak ada data yang tersedia pada tabel ini
+										</td>
+									</tr>
+								</tbody>
+								<tfoot class="bold">
+									<tr class="bg-light">
+										<td align="right">
+											Total
+										</td>
+										<td align="center">
+											<% gt_stay %>
+										</td>
+										<td align="right">
+											<% gt_room %>
+										</td>
+										<td align="right">
+											<% gt_discount %>
+										</td>
+										<td align="right">
+											<% gt_deposit %>
+										</td>
+										<td align="right">
+											<% gt_consumption %>
+										</td>
+										<td align="right">
+											<% gt_service %>
+										</td>
+										<td align="right">
+											<% gt_total %>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+			<!-- /.row -->
+		</div><!-- /.container-fluid -->
+	</section>
+	<!-- /.content -->
+
+</div>
+
+{% endblock  %}
+
+{% block add_javascript %}
+{{ parent() }}
+
+<script type="text/javascript">
+	jQuery(function($) {
+
+    // Function available at https://gist.github.com/sixlive/55b9630cc105676f842c
+
+    $.fn.printDiv = function() {
+      var printContents = $(this).html();
+      var originalContents = $('body').html();
+      $('body').html(printContents);
+      $('body').addClass('js-print');
+      window.print();
+      $('body').html(originalContents);
+      $('body').removeClass('js-print');
+    };
+
+    // Print
+    $('#button-print').click(function() {
+      $('#master-content').printDiv();
+      setTimeout(function(){
+        window.close()
+        location.reload();
+      },10);
+    });
+
+  });
+</script>
+
+<script type="text/javascript" src="{{ assets_url('assets/js/app/report/r_guest_groups.js?') }}"></script>
+<script type="text/javascript">
+	window.REPORT.init();
+	window.DATETIME.initDatePicker();
+	window.INPUT.handleSelect2();
+</script>
+{% endblock  %}

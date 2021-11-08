@@ -1,0 +1,91 @@
+<div id="embed-vue">
+
+	<div class="modal-header">
+		<h5 class="modal-title">{{ content_title }}</h5>
+
+		<button type="button" class="close embed-close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+
+
+	<div class="modal-body">
+
+		<div class="embed-vue">
+
+				<input type="text" class="form-control float-right" style="width:25%; margin: 0 0 1% 0;" id="search"
+					@keyup="getDataEmbed($event.target.value)" placeholder="Pencarian...">
+
+				<div class="card-body table-responsive p-0" style="max-height: 400px;">
+					<table class="table table-head-fixed text-nowrap" id="embed-table">
+						<thead>
+							<tr>
+								<!-- <th align="left" style="white-space: nowrap; width: 1%;">
+									<input class="check-all" type="checkbox">
+								</th> -->
+								<th align="left">Kode</th>
+								<th align="left">Transaksi</th>
+								<th align="left">Harga</th>
+								<th align="left"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<template v-for="(row, idx) in listData">
+								<tr>
+									<!-- <tr v-bind:class="{'success': (customer.id == selectedCustomer)}"> -->
+									<!-- <td style="white-space: nowrap; width: 1%;">
+										<input class="check-sub" type="checkbox" v-bind:value="idx">
+									</td> -->
+									<td>
+										<% row.id %>
+										<% row.code %>
+									</td>
+									<td>
+										<% row.number %>
+										<% row.type %>
+									</td>
+									<td>
+										<% row.price %>
+										<br>
+										<% row.discount %>
+										<br>
+										<% row.deposit %>
+										<br>
+										<% row.total %>
+										<br>
+										<b><% row.paid %></b>
+									</td>
+									<td>
+										<button class="btn btn-sm" v-bind:class="row.btncolor" style="width: 31px; height: 31px;" @click="getSelectedData(row, idx)">
+											<i v-bind:class="row.btnicon"></i>
+										</button>
+									</td>
+								</tr>
+							</template>
+						</tbody>
+					</table>
+				</div>
+
+			<!-- </div> -->
+
+		</div>
+
+	</div>
+
+	<div class="modal-footer">
+			<!-- <button class="btn btn-success btn-sm" @click="getSelectedData()">
+				<i class="fa fa-check"></i> &nbsp; Selesai
+			</button> -->
+			<button class="btn btn-success" style="width: 10%;" @click="closeModal()">
+				Selesai
+			</button>
+	</div>
+
+</div>
+
+<script type="text/javascript" src="{{ assets_url('assets/js/app/payments/embed.js') }}"></script>
+<script type="text/javascript">
+
+	window.EMBED.init();
+
+</script>

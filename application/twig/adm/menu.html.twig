@@ -1,0 +1,311 @@
+<!-- Brand Logo -->
+  		<a href="#" class="brand-link">
+  			<img src="{{ base_url('assets/images/logo/h_logo.png') }}" class="brand-image" style="opacity: .8; margin-left: 9%;"> 
+  			<span class="brand-text">Sistem Reservasi</span>
+  		</a>
+
+  		<!-- Sidebar -->
+  		<div class="sidebar">
+  			<!-- Sidebar user panel (optional) -->
+  			<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+  				<div class="image">
+  					<img src="{{ base_url('assets/adminLTE/dist/img/avatar5.png') }}" class="img-circle" alt="User Image">
+  				</div>
+  				<div class="info">
+  					<!-- <a href="#" class="d-block"> -->
+						{% if(logged_user('fullname') != "") %} {{ logged_user('fullname') }} {% endif %}
+					<!-- </a> -->
+  				</div>
+  			</div>
+
+  			<!-- Sidebar Menu -->
+  			<nav class="mt-2">
+  				<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+					<li class="nav-item">
+					<a href="{{ site_url('adm/dashboard') }}" class="nav-link {{ active_link('dashboard') }}">
+						<i class="nav-icon fas fa-h-square"></i>
+						<p>
+							Dashboard
+						</p>
+					</a>
+					</li>
+
+					{% if check_roles('1') or check_roles('2') or check_roles('3') %}
+  					<li class="nav-item has-treeview {{ menu_open_master() }}">
+  						<a href="#" class="nav-link {{ active_link_master() }}">
+  							<i class="nav-icon far fa-folder-open"></i>
+  							<p>
+  								Master
+  								<i class="fas fa-angle-left right"></i>
+  							</p>
+  						</a>
+  						<ul class="nav nav-treeview">
+							{% if check_roles('1') %}
+							<li class="nav-item">
+  								<a href="{{ site_url('adm/cs_groups') }}" class="nav-link {{ active_link('cs_groups') }}">
+  									<i class="fas fa-project-diagram nav-icon"></i>
+  									<p>Grup</p>
+  								</a>
+							</li>
+							<li class="nav-item">
+  								<a href="{{ site_url('adm/guest_groups') }}" class="nav-link {{ active_link('guest_groups') }}">
+  									<i class="fas fa-chalkboard-teacher nav-icon"></i>
+  									<p>Grup Tamu</p>
+  								</a>
+							</li>
+							<li class="nav-item">
+  								<a href="{{ site_url('adm/guests') }}" class="nav-link {{ active_link('guests') }}">
+  									<i class="fas fa-child nav-icon"></i>
+  									<p>Tamu</p>
+  								</a>
+							</li>
+							<li class="nav-item">
+  								<a href="{{ site_url('adm/room_types') }}" class="nav-link {{ active_link('room_types') }}">
+  									<i class="fas fa-bed nav-icon"></i>
+  									<p>Tipe Kamar</p>
+  								</a>
+							</li>
+							<li class="nav-item">
+  								<a href="{{ site_url('adm/rooms') }}" class="nav-link {{ active_link('rooms') }}">
+  									<i class="fas fa-door-open nav-icon"></i>
+  									<p>Kamar</p>
+  								</a>
+							</li>
+							<li class="nav-item">
+  								<a href="{{ site_url('adm/special_rates') }}" class="nav-link {{ active_link('special_rates') }}">
+  									<i class="fas fa-percentage nav-icon"></i>
+  									<p>Harga Khusus</p>
+  								</a>
+							</li>
+							<li class="nav-item">
+  								<a href="{{ site_url('adm/items') }}" class="nav-link {{ active_link('items') }}">
+  									<i class="fas fa-percentage nav-icon"></i>
+  									<p>Barang</p>
+  								</a>
+							</li>
+							<li class="nav-item">
+  								<a href="{{ site_url('adm/consumptions') }}" class="nav-link {{ active_link('consumptions') }}">
+  									<i class="fas fa-utensils nav-icon"></i>
+  									<p>Makanan & Minuman</p>
+  								</a>
+							</li>
+							<li class="nav-item">
+  								<a href="{{ site_url('adm/services') }}" class="nav-link {{ active_link('services') }}">
+  									<i class="fas fa-luggage-cart nav-icon"></i>
+  									<p>Layanan</p>
+  								</a>
+							</li>
+							<li class="nav-item">
+  								<a href="{{ site_url('adm/payment_methods') }}" class="nav-link {{ active_link('payment_methods') }}">
+  									<i class="far fa-credit-card nav-icon"></i>
+  									<p>Metode Pembayaran</p>
+  								</a>
+							</li>
+							{% endif %}
+  						</ul>
+					</li>
+					{% endif %}
+					<li class="nav-item has-treeview {{ menu_open_stock() }}">
+  						<a href="#" class="nav-link {{ active_link_stock() }}">
+  							<i class="nav-icon far fa-folder-open"></i>
+  							<p>
+  								Stok
+  								<i class="fas fa-angle-left right"></i>
+  							</p>
+  						</a>
+  						<ul class="nav nav-treeview">
+							<li class="nav-item">
+  								<a href="{{ site_url('adm/stock_in') }}" class="nav-link {{ active_link('stock_in') }}">
+  									<i class="fas fa-project-diagram nav-icon"></i>
+  									<p>Masuk</p>
+  								</a>
+							</li>
+							<li class="nav-item">
+  								<a href="{{ site_url('adm/stock_out') }}" class="nav-link {{ active_link('stock_out') }}">
+  									<i class="fas fa-project-diagram nav-icon"></i>
+  									<p>Keluar</p>
+  								</a>
+							</li>
+  						</ul>
+					</li>
+					{% if check_roles('1') %}
+					<li class="nav-item">
+					<a href="{{ site_url('adm/booking') }}" class="nav-link {{ active_link('booking') }}">
+						<i class="nav-icon far fa-circle"></i>
+						<p>
+							Booking Kamar
+						</p>
+					</a>
+					</li>
+					<li class="nav-item">
+					<a href="{{ site_url('adm/checkin') }}" class="nav-link {{ active_link('checkin') }}">
+						<i class="nav-icon far fa-circle"></i>
+						<p>
+							Check-In
+						</p>
+					</a>
+					</li>
+					<li class="nav-item">
+					<a href="{{ site_url('adm/checkout') }}" class="nav-link {{ active_link('checkout') }}">
+						<i class="nav-icon far fa-circle"></i>
+						<p>
+							Check-Out
+						</p>
+					</a>
+					</li>
+					{# <li class="nav-item">
+					<a href="#" class="nav-link {{ active_link('markup') }}" style="opacity:0.5; cursor:not-allowed;">
+						<i class="nav-icon far fa-circle"></i>
+						<p>
+							Markup
+						</p>
+					</a>
+					</li> #}
+					<li class="nav-item">
+					<a href="{{ site_url('adm/consumption_services') }}" class="nav-link {{ active_link('consumption_services') }}">
+						<i class="nav-icon far fa-circle"></i>
+						<p>
+							Transaksi
+						</p>
+					</a>
+					</li>
+					<li class="nav-item">
+					<a href="{{ site_url('adm/deposit') }}" class="nav-link {{ active_link('deposit') }}">
+						<i class="nav-icon far fa-circle"></i>
+						<p>
+							Deposit
+						</p>
+					</a>
+					</li>
+					<li class="nav-item">
+					<a href="{{ site_url('adm/payments') }}" class="nav-link {{ active_link('payments') }}">
+						<i class="nav-icon far fa-circle"></i>
+						<p>
+							Pembayaran
+						</p>
+					</a>
+					</li>
+					{% endif %}
+					
+					{% if check_roles('1') or check_roles('3') %}
+					<li class="nav-header">Laporan</li>
+					{# <li class="nav-item"> #}
+						{# <a href="{{ site_url('adm/r_guest_groups') }}" class="nav-link {{ active_link('r_guest_groups') }}"> #}
+						{# <a href="#" class="nav-link {{ active_link('xcv') }}" style="opacity:0.5; cursor:not-allowed;">
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Grup Tamu</p>
+						</a>
+					</li> #}
+					{# <li class="nav-item"> #}
+						{# <a href="{{ site_url('adm/r_room_types') }}" class="nav-link {{ active_link('r_room_types') }}"> #}
+						{# <a href="#" class="nav-link {{ active_link('xcv') }}" style="opacity:0.5; cursor:not-allowed;">
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Tipe Kamar</p>
+						</a>
+					</li> #}
+					{# <li class="nav-item">
+						<a href="{{ site_url('adm/r_payment_methods') }}" class="nav-link {{ active_link('r_payment_methods') }}">
+						<a href="#" class="nav-link {{ active_link('r_payment_methods') }}" style="opacity:0.5; cursor:not-allowed;">
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Metode Pembayaran</p>
+						</a>
+					</li> #}
+					{# <li class="nav-item"> #}
+						{# <a href="{{ site_url('adm/r_consumption_services') }}" class="nav-link {{ active_link('r_consumption_services') }}"> #}
+						{# <a href="#" class="nav-link {{ active_link('xcvs') }}" style="opacity:0.5; cursor:not-allowed;">
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Produk & Layanan</p>
+						</a>
+					</li> #}
+					<li class="nav-item">
+						<a href="{{ site_url('adm/r_stocks') }}" class="nav-link {{ active_link('r_stocks') }}">
+						{# <a href="#" class="nav-link {{ active_link('r_payments') }}" style="opacity:0.5; cursor:not-allowed;"> #}
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Stok</p>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{{ site_url('adm/r_payments') }}" class="nav-link {{ active_link('r_payments') }}">
+						{# <a href="#" class="nav-link {{ active_link('r_payments') }}" style="opacity:0.5; cursor:not-allowed;"> #}
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Kasir</p>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{{ site_url('adm/r_fees') }}" class="nav-link {{ active_link('r_fees') }}">
+						{# <a href="#" class="nav-link {{ active_link('r_payments') }}" style="opacity:0.5; cursor:not-allowed;"> #}
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Fee</p>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{{ site_url('adm/r_transactions') }}" class="nav-link {{ active_link('r_transactions') }}">
+						{# <a href="#" class="nav-link {{ active_link('r_payments') }}" style="opacity:0.5; cursor:not-allowed;"> #}
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Transaksi</p>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{{ site_url('adm/r_shifts') }}" class="nav-link {{ active_link('r_shifts') }}">
+						{# <a href="#" class="nav-link {{ active_link('r_payments') }}" style="opacity:0.5; cursor:not-allowed;"> #}
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Room Count Sheet</p>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{{ site_url('adm/r_eaed') }}" class="nav-link {{ active_link('r_eaed') }}">
+						{# <a href="#" class="nav-link {{ active_link('r_payments') }}" style="opacity:0.5; cursor:not-allowed;"> #}
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>EAED</p>
+						</a>
+					</li>
+					{# <li class="nav-item">
+						<a href="{{ site_url('adm/r_monthrecaps') }}" class="nav-link {{ active_link('r_monthrecaps') }}">
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Bulanan (Rekap)</p>
+						</a>
+					</li> #}
+					<li class="nav-item">
+						<a href="{{ site_url('adm/r_dayrecaps') }}" class="nav-link {{ active_link('r_dayrecaps') }}">
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Bulanan (Rekap)</p>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{{ site_url('adm/r_recaps') }}" class="nav-link {{ active_link('r_recaps') }}">
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Tahunan (Rekap)</p>
+						</a>
+					</li>
+					{# <li class="nav-item">
+						<a href="{{ site_url('adm/r_payrecaps') }}" class="nav-link {{ active_link('r_payrecaps') }}">
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Pembayaran (Rekap)</p>
+						</a>
+					</li> #}
+					<li class="nav-item">
+						<a href="{{ site_url('adm/r_dayrecaps2') }}" class="nav-link {{ active_link('r_payrecaps') }}">
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Pembayaran (Rekap)</p>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{{ site_url('adm/r_deprecaps') }}" class="nav-link {{ active_link('r_deprecaps') }}">
+							<i class="nav-icon fas fa-file-alt"></i>
+							<p>Deposit</p>
+						</a>
+					</li>
+					{% endif %}
+
+  					<li class="nav-header">Konfigurasi</li>
+  					<li class="nav-item">
+  						<a href="{{ site_url('adm/users') }}" class="nav-link {{ active_link('users') }}">
+  							<i class="nav-icon fas fa-cog"></i>
+  							<p>Pengguna</p>
+  						</a>
+  					</li>
+  				</ul>
+  			</nav>
+  			<!-- /.sidebar-menu -->
+  		</div>
+  		<!-- /.sidebar -->

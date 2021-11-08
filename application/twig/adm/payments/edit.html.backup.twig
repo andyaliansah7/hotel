@@ -1,0 +1,296 @@
+{% extends 'adm/layout.html.twig' %}
+
+{% block content %}
+
+<div class="content-wrapper" id="vue-edit">
+
+	<form class="edit-form" method="POST" action="{{ site_url('adm/payments/save') }}">
+	
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h4>{{ content_title }}</h4>
+				</div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item">Beranda</li>
+						<li class="breadcrumb-item"><a href="#">Purchase Order</a></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+
+		<div class="container-fluid">
+
+			<div class="row">
+
+				<div class="col-md-12">
+
+					<div class="card card-default">
+						
+						<div class="card-body">
+							<div class="row">
+								<div class="col-md-3">
+									<div class="form-group">
+										<input type="hidden" class="form-control" name="id" id="id" value="{{ id }}">
+
+										<label class="control-label">Nomor</label>
+										<input type="text" class="form-control" name="number" tabindex="1"
+											value="{{ autonumber }}" required="required">
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="form-group">
+										<label>Tanggal</label>
+
+										<div class="input-group date-input" data-target-input="nearest">
+											<input type="text" class="form-control" name="date" tabindex="2" value="{{ date_text }}" required="required">
+
+											<div class="input-group-append" data-target=".date-input" data-toggle="datetimepicker">
+												<div class="input-group-text"><i class="far fa-calendar"></i></div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="form-group">
+										<label>Tamu</label>
+										<select class="form-control select2" id="guest" name="guest" tabindex="3" required="required">
+											<option value="register">- Registrasi Baru -</option>
+											{% if guest_data %}
+											{% for guest_row in guest_data %}
+											<option value="{{ guest_row.guest_id }}"
+												{% if same(guest_row.guest_id, check_array_key(header_data, 'guest_id')) %}
+												selected="selected" {% endif %}>{{ guest_row.guest_identity_number }} | {{ guest_row.guest_name }} ({{ guest_row.guest_phone }})</option>
+											{% endfor %}
+											{% endif %}
+										</select>
+									</div>
+								</div>
+
+							</div>
+
+							<div class="row">
+				<div class="col-md-8">
+					<div class="form-group">
+						<label class="control-label">Jumlah</label>
+						<input type="text" class="form-control currency-mask text-left" id="total_paid_1" name="total_paid_1" tabindex="16" placeholder="0"
+								value="{{ to_decimal(check_array_key(header_data, 'total_paid_1')) }}" required="required">
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label">Metode</label>
+						<select class="form-control select2" name="payment_method_1" tabindex="17" required="required">
+							<option value="">- Pilih -</option>
+							{% if paymethod_data %}
+							{% for paymethod_row in paymethod_data %}
+							<option value="{{ paymethod_row.payment_method_id }}"
+								{% if same(paymethod_row.payment_method_id, check_array_key(header_data, 'payment_method_1')) %}
+								selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+							{% endfor %}
+							{% endif %}
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-8">
+					<div class="form-group">
+						<input type="text" class="form-control currency-mask text-left" id="total_paid_2" name="total_paid_2" tabindex="18" placeholder="0"
+								value="{{ to_decimal(check_array_key(header_data, 'total_paid_2')) }}">
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<select class="form-control select2" name="payment_method_2" tabindex="19">
+							<option value="">- Pilih -</option>
+							{% if paymethod_data %}
+							{% for paymethod_row in paymethod_data %}
+							<option value="{{ paymethod_row.payment_method_id }}"
+								{% if same(paymethod_row.payment_method_id, check_array_key(header_data, 'payment_method_2')) %}
+								selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+							{% endfor %}
+							{% endif %}
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-8">
+					<div class="form-group">
+						<input type="text" class="form-control currency-mask text-left" id="total_paid_3" name="total_paid_3" tabindex="20" placeholder="0"
+								value="{{ to_decimal(check_array_key(header_data, 'total_paid_3')) }}">
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<select class="form-control select2" name="payment_method_3" tabindex="21">
+							<option value="">- Pilih -</option>
+							{% if paymethod_data %}
+							{% for paymethod_row in paymethod_data %}
+							<option value="{{ paymethod_row.payment_method_id }}"
+								{% if same(paymethod_row.payment_method_id, check_array_key(header_data, 'payment_method_3')) %}
+								selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+							{% endfor %}
+							{% endif %}
+						</select>
+					</div>
+				</div>
+			</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+
+			<div class="row">
+				<div class="col-12">
+					<div class="card">
+						<div class="card-header">
+							<!-- <h3 class="card-title">List Material</h3> -->
+								
+								<button type="button" class="btn btn-primary" @click="detailAdd" style="width: 13%; margin-right:.5%">
+									Tambah Item
+								</button>
+								
+								<button type="button" class="btn btn-danger" @click="detailDelete" style="width: 13%;">
+									Hapus Item
+								</button>
+						</div>
+
+						<div class="card-body table-responsive p-0" style="max-height: 400px;">
+							<table class="table table-head-fixed text-nowrap" id="edit-table">
+								<thead>
+									<tr>
+										<th align="left" style="white-space: nowrap; width: 1%;">
+											<input class="check-all" type="checkbox">
+										</th>
+										<th align="left" style="white-space: nowrap; width: 8%;">Kode</th>
+										<th align="left" style="white-space: nowrap; width: 8%;">Transaksi</th>
+										<th align="left" style="white-space: nowrap; width: 8%;">Type</th>
+										<th align="left" style="white-space: nowrap; width: 8%;">Harga</th>
+										<th align="left" style="white-space: nowrap; width: 8%;">Diskon</th>
+										<th align="left" style="white-space: nowrap; width: 8%;">Deposit</th>
+										<th align="left" style="white-space: nowrap; width: 8%;">Total</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(row, detail_idx) in detailData">
+										<td style="white-space: nowrap; width: 1%;">
+											<input class="check-sub" type="checkbox" v-bind:value="detail_idx">
+										</td>
+										<td style="white-space: nowrap; width: 8%;">
+											<% row.id %>
+										</td>
+										<td style="white-space: nowrap; width: 8%;">
+											<% row.number %>
+										</td>
+										<td style="white-space: nowrap; width: 8%;">
+											<% row.type %>
+										</td>
+										<td style="white-space: nowrap; width: 8%;">
+											<% row.price %>
+										</td>
+										<td style="white-space: nowrap; width: 8%;">
+											<% row.discount %>
+										</td>
+										<td style="white-space: nowrap; width: 8%;">
+											<% row.deposit %>
+										</td>
+										<td style="white-space: nowrap; width: 8%;">
+											<% row.total %>
+										</td>
+										{# <td style="white-space: nowrap; width: 8%;">
+											<input type="text" class="form-control" style="width:100%;" v-model="row.remark">
+										</td> #}
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="card-footer">
+
+							<input type="text" name="total_price" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly" 
+							v-bind:value="countTotalPrice()">
+
+							<input type="text" name="total_discount" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly" 
+							v-bind:value="countTotalDiscount()">
+
+							<input type="text" name="total_deposit" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly" 
+							v-bind:value="countTotalDeposit()">
+
+							<input type="text" name="total_amount" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly" 
+							v-bind:value="countTotalAmount()">
+
+							<div class="form-group">
+								<label class="control-label">Keterangan</label>
+								<textarea class="form-control" name="description" rows="6">{{ check_array_key(header_data, 'purchase_order_header_description') }}</textarea>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+
+				<div class="col-md-12">
+
+					<div class="card card-default col-md-2 float-right">
+						
+						<div class="card-body">
+							<div class="row">
+								<div class="col-md-12">
+									<button type="submit" class="btn btn-success float-right" style="width: 100%;">
+									Simpan
+								</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+		 	
+		</div>
+
+	</section>
+	<!-- /.content -->
+
+	</form>
+
+</div>
+
+<div class="modal fade edit-modal" id="modal-default">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content edit-modal-content">
+			Loading...
+		</div>
+	</div>
+</div>
+
+{% endblock  %}
+
+{% block add_javascript %}
+{{ parent() }}
+
+
+<script type="text/javascript" src="{{ assets_url('assets/js/app/payments/edit.js?') }}"></script>
+
+<script type="text/javascript">
+	window.FORM_EDIT.handleVue();
+	window.INPUT.handleSelect2();
+	window.INPUT.handleMaskCurrency();
+</script>
+{% endblock  %}

@@ -1,0 +1,112 @@
+<form class="master-form" action="{{ site_url('adm/room_types/save') }}" method="POST">
+
+	<div class="modal-header">
+		<h5 class="modal-title">{{ content_title }}</h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+
+	<div class="modal-body">
+		<input class="form-control" name="id" value="{{ id }}" type="hidden">
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Kode</label>
+					<input type="text" class="form-control" id="namecheck" name="code" tabindex="1" placeholder="DELX"
+						value="{{ check_array_key(get_data, 'room_type_code') }}" required="required">
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Nama Tipe Kamar</label>
+					<input type="text" class="form-control" name="name" tabindex="2" placeholder="Deluxe Room"
+						value="{{ check_array_key(get_data, 'room_type_name') }}" required="required">
+				</div>
+			</div>
+			{# <div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Tahun</label>
+					<input type="number" class="form-control" name="year" tabindex="3" placeholder="2020" type="text" pattern="\d*" minlength="4" maxlength="4"
+						value="{{ check_array_key(get_data, 'room_type_year') }}" required="required">
+				</div>
+			</div> #}
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Fasilitas</label>
+					<input type="text" class="form-control" name="facilities" tabindex="3" placeholder="1 Double Bed (King Size), Hot Water and Breakfast"
+						value="{{ check_array_key(get_data, 'room_type_facilities') }}" required="required">
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Pax</label>
+					<input type="text" class="form-control" name="pax" tabindex="4" placeholder="1"
+						value="{{ check_array_key(get_data, 'room_type_pax') }}" required="required">
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Jenis</label>
+					<select class="form-control select2" name="group" tabindex="2" required="required">
+						<option value="">- Pilih -</option>
+						<option value="Room"
+							{% if same("Room", check_array_key(get_data, 'room_type_group')) %}
+							selected="selected" {% endif %}>Room</option>
+						<option value="Function Room"
+							{% if same("Function Room", check_array_key(get_data, 'room_type_group')) %}
+							selected="selected" {% endif %}>Function Room</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Harga (Weekday)</label>
+					<input type="text" class="form-control currency-mask text-left" name="price_weekday" tabindex="5" placeholder="850,000"
+						value="{{ price_weekday }}" required="required">
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Harga (Weekend)</label>
+					<input type="text" class="form-control currency-mask text-left" name="price_weekend" tabindex="6" placeholder="1,000,000"
+						value="{{ price_weekend }}" required="required">
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default waves-effect master-cancel" data-dismiss="modal">Batal</button>
+
+		<div class="btn-group" role="group">
+	        <button name="action" value="save" class="btn btn-primary btn-save" type="submit">
+	        	Simpan
+	        </button>
+	        <button type="button" class="btn btn-primary btn-save dropdown-toggle" data-toggle="dropdown"
+	        	aria-haspopup="true" aria-expanded="false">
+	        </button>
+			<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+				<!-- <a class="dropdown-item" href="#">Dropdown link</a> -->
+				<button class="dropdown-item" name="action" value="save_new" type="submit" href="#">Simpan &amp; Baru</button>
+				<button class="dropdown-item" name="action" value="save_close" type="submit" href="#">Simpan &amp; Tutup</button>
+			</div>
+		</div>
+	</div>
+
+</form>
+
+<script type="text/javascript">
+
+	var elDivID = "#namecheck";
+	var elResult = ".result_check";
+	var elUrl = "{{ site_url('adm/room_types/check_id') }}";
+	var elBtn = ".btn-save";
+
+	window.FORM.handleCheckField2(elDivID, elResult, elUrl, elBtn, "", "");
+	window.INPUT.handleSelect2();
+	window.INPUT.handleMaskCurrency();
+
+</script>

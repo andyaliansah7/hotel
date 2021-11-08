@@ -1,0 +1,451 @@
+{% extends 'adm/layout.html.twig' %}
+
+{% block content %}
+
+<div class="content-wrapper" id="vue-edit" style="background-color:white">
+
+	<form class="edit-form" method="POST" action="{{ site_url('adm/payments/save') }}">
+	
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h4>{{ content_title }}</h4>
+				</div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item">Beranda</li>
+						<li class="breadcrumb-item"><a href="#">Pembayaran</a></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+
+		<div class="container-fluid">
+
+			<div class="row ml-5 mr-5 mt-4">
+				<div class="col-md-5">
+				
+					<p class="h5 text-muted">Identitas Tamu</p>
+					<hr>
+					<input type="hidden" class="form-control" name="id" id="id" value="{{ id }}">
+					<input type="hidden" class="form-control" name="type_room" id="type_room" value="{{ check_array_key(header_data, 'type_room') }}">
+					<input type="hidden" class="form-control" name="type_cons" id="type_cons" value="{{ check_array_key(header_data, 'type_consumption') }}">
+
+					<div class="form-group">
+						<label>Tanggal</label>
+						<input type="date" class="form-control" name="date" tabindex="1" value="{{ check_array_key(header_data, 'payment_date') }}" required="required">
+					</div>
+
+					<div class="form-group">
+						<label>Nama Tamu</label>
+						<select class="form-control select2 guest-select" id="guest" name="guest" tabindex="3" required="required">
+							<option value="0">- Bukan Tamu Menginap -</option>
+							{% if guest_data %}
+							{% for guest_row in guest_data %}
+							<option value="{{ guest_row.guest_id }}"
+								{% if same(guest_row.guest_id, check_array_key(header_data, 'guest_id')) %}
+								selected="selected" {% endif %}>{{ guest_row.guest_identity_number }} | {{ guest_row.guest_name }} ({{ guest_row.guest_phone }})</option>
+							{% endfor %}
+							{% endif %}
+						</select>
+					</div>
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-6">
+								<address>
+									<strong>Kontak</strong><br>
+									{# <span class="text-primary"><% guestIDNumber %></span>
+									<br/> #}
+									<span class="text-primary"><% guestPhone %></span>
+								</address>
+							</div>
+							<div class="col-md-6">
+							&nbsp;
+								<address>
+								<% guestAddress %>
+								</address>
+							</div>
+						</div>
+					</div>
+					
+					<p class="h5 mt-4 text-muted">Deposit</p>
+					<hr>
+
+					<div class="row">
+						<div class="col-md-12">
+							<ul class="list-group shadow">
+								<li class="list-group-item bold" v-bind:class="row.btncolor" v-for="(row, idx) in depositData" @click="getSelectedData(row, idx)" style="cursor: pointer">
+									Rp. <% row.total_amount %>
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<p class="h5 mt-4 text-muted">Detail Pembayaran</p>
+					<hr>
+
+					<div class="row">
+					<div class="col-md-12">
+						<table class="table table-borderless" width="100%">
+							<tr>
+								<td class="small text-muted" style="width:65%">Biaya (Kamar, Fasilitas, Resto & Cafe*)</td>
+								<td class="small text-muted" style="width:35%">Rp. <% countTotalPrice() %></td>
+							</tr>
+							<tr>
+								<td class="small text-muted" style="width:65%">Diskon</td>
+								<td class="small text-muted" style="width:35%">Rp. <% countTotalDiscount() %></td>
+							</tr>
+							<tr>
+								<td class="small text-muted" style="width:65%">Deposit</td>
+								<td class="small text-muted" style="width:35%">Rp. <% countTotalDepositAll() %></td>
+								<input type="hidden" id="all_deposit" v-bind:value="countTotalDepositAll()">
+							</tr>
+							<tr>
+								<td class="bold text-success" style="width:65%">Grand Total</td>
+								<td class="bold text-success" style="width:35%">Rp. <% countTotalAmount() %></td>
+							</tr>
+						</table>
+
+						<hr>
+					</div>
+					
+					<div class="col-md-5">
+							<div class="form-group">
+								<label class="control-label">Metode</label>
+								<select class="form-control select2" name="payment_method_1" tabindex="17" required="required">
+									<option value="">- Pilih -</option>
+									{% if paymethod_data %}
+									{% for paymethod_row in paymethod_data %}
+									<option value="{{ paymethod_row.payment_method_id }}"
+										{% if same(paymethod_row.payment_method_id, check_array_key(header_data, 'payment_method_1')) %}
+										selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+									{% endfor %}
+									{% endif %}
+								</select>
+							</div>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group">
+								<label class="control-label">Jumlah bayar</label>
+								<input type="text" class="form-control currency-mask" id="total_paid_1" name="total_paid_1" tabindex="16" placeholder="0"
+										value="{{ to_decimal(check_array_key(header_data, 'total_paid_1')) }}" @keyup="handlePaid($event.target.value)" required="required">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+
+						<div class="col-md-5">
+							<label class="control-label small">Kamar</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group">
+								<input type="text" class="form-control currency-mask" id="total_room_1" name="total_room_1"  tabindex="18" placeholder="0"
+										value="{{ to_decimal(check_array_key(header_data, 'total_room_1')) }}">
+							</div>
+						</div>
+						
+					</div>
+
+					<div class="row">
+
+						<div class="col-md-5">
+							<label class="control-label small">Fasilitas</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group">
+								<input type="text" class="form-control currency-mask" id="total_service_1" name="total_service_1"  tabindex="18" placeholder="0"
+										value="{{ to_decimal(check_array_key(header_data, 'total_service_1')) }}">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+
+						<div class="col-md-5">
+							<label class="control-label small">Resto dan Cafe</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group">
+								<input type="text" class="form-control currency-mask" id="total_consumption_1" name="total_consumption_1"  tabindex="18" placeholder="0"
+										value="{{ to_decimal(check_array_key(header_data, 'total_consumption_1')) }}">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<hr>
+						</div>
+					</div>
+
+					<div class="row">
+
+					<div class="col-md-5">
+							<div class="form-group">
+								<select class="form-control select2" name="payment_method_2" tabindex="19">
+									<option value="">- Pilih -</option>
+									{% if paymethod_data %}
+									{% for paymethod_row in paymethod_data %}
+									<option value="{{ paymethod_row.payment_method_id }}"
+										{% if same(paymethod_row.payment_method_id, check_array_key(header_data, 'payment_method_2')) %}
+										selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+									{% endfor %}
+									{% endif %}
+								</select>
+							</div>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group">
+								<input type="text" class="form-control currency-mask" id="total_paid_2" name="total_paid_2" tabindex="18" placeholder="0"
+										value="{{ to_decimal(check_array_key(header_data, 'total_paid_2')) }}">
+							</div>
+						</div>
+						
+					</div>
+
+					<div class="row">
+
+						<div class="col-md-5">
+							<label class="control-label small">Kamar</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group">
+								<input type="text" class="form-control currency-mask" id="total_room_2" name="total_room_2"  tabindex="18" placeholder="0"
+										value="{{ to_decimal(check_array_key(header_data, 'total_room_2')) }}">
+							</div>
+						</div>
+						
+					</div>
+
+					<div class="row">
+
+						<div class="col-md-5">
+							<label class="control-label small">Fasilitas</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group">
+								<input type="text" class="form-control currency-mask" id="total_service_2" name="total_service_2"  tabindex="18" placeholder="0"
+										value="{{ to_decimal(check_array_key(header_data, 'total_service_2')) }}">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+
+						<div class="col-md-5">
+							<label class="control-label small">Resto dan Cafe</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group">
+								<input type="text" class="form-control currency-mask" id="total_consumption_2" name="total_consumption_2"  tabindex="18" placeholder="0"
+										value="{{ to_decimal(check_array_key(header_data, 'total_consumption_2')) }}">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<hr>
+						</div>
+					</div>
+
+					<div class="row">
+					<div class="col-md-5">
+							<div class="form-group">
+								<select class="form-control select2" name="payment_method_3" tabindex="21">
+									<option value="">- Pilih -</option>
+									{% if paymethod_data %}
+									{% for paymethod_row in paymethod_data %}
+									<option value="{{ paymethod_row.payment_method_id }}"
+										{% if same(paymethod_row.payment_method_id, check_array_key(header_data, 'payment_method_3')) %}
+										selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+									{% endfor %}
+									{% endif %}
+								</select>
+							</div>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group">
+								<input type="text" class="form-control currency-mask" id="total_paid_3" name="total_paid_3" tabindex="20" placeholder="0"
+										value="{{ to_decimal(check_array_key(header_data, 'total_paid_3')) }}">
+							</div>
+						</div>
+						
+					</div>
+
+					<div class="row">
+						
+						<div class="col-md-5">
+							<label class="control-label small">Kamar</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group">
+								<input type="text" class="form-control currency-mask" id="total_room_3" name="total_room_3"  tabindex="18" placeholder="0"
+										value="{{ to_decimal(check_array_key(header_data, 'total_room_3')) }}">
+							</div>
+						</div>
+						
+					</div>
+
+					<div class="row">
+
+						<div class="col-md-5">
+							<label class="control-label small">Fasilitas</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group">
+								<input type="text" class="form-control currency-mask" id="total_service_3" name="total_service_3"  tabindex="18" placeholder="0"
+										value="{{ to_decimal(check_array_key(header_data, 'total_service_3')) }}">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+
+						<div class="col-md-5">
+							<label class="control-label small">Resto dan Cafe</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group">
+								<input type="text" class="form-control currency-mask" id="total_consumption_3" name="total_consumption_3"  tabindex="18" placeholder="0"
+										value="{{ to_decimal(check_array_key(header_data, 'total_consumption_3')) }}">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<hr>
+							<div class="form-group">
+								<label class="control-label">Keterangan</label>
+								<textarea class="form-control" name="description" id="description">{{ header_data.description }}</textarea>
+							</div>
+
+							<div class="form-group">
+								<label class="control-label">Shift</label>
+								<select class="form-control select2" name="shift" tabindex="14" required="required">
+									<option value="">- Pilih -</option>
+									{% if shift_data %}
+									{% for shift_row in shift_data %}
+									<option value="{{ shift_row.shift_id }}"
+										{% if same(shift_row.shift_id, check_array_key(header_data, 'shift_id')) %}
+										selected="selected" {% endif %}>{{ shift_row.shift_name }} ({{ shift_row.shift_time }})</option>
+									{% endfor %}
+									{% endif %}
+								</select>
+							</div>
+							<hr>
+						</div>
+					</div>
+
+					<input type="hidden" name="total_price" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly" 
+					v-bind:value="countTotalPrice()">
+					<input type="hidden" name="total_discount" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly" 
+					v-bind:value="countTotalDiscount()">
+					<input type="hidden" name="total_deposit" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly" 
+					v-bind:value="countTotalDeposit()">
+					<input type="hidden" name="total_amount" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly" 
+					v-bind:value="countTotalAmount()">
+
+					<input type="hidden" name="total_deposit_master" id="total_deposit_master" v-bind:value="countDepositMaster()" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly">
+					<input type="hidden" name="total_deposit_kartu" id="total_deposit_kartu" v-bind:value="countDepositKartu()" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly">
+					<input type="hidden" name="total_deposit_tunai" id="total_deposit_tunai" v-bind:value="countDepositTunai()" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly">
+					<input type="hidden" name="total_deposit_trans" id="total_deposit_trans" v-bind:value="countDepositTrans()" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly">
+
+					<button type="submit" id="btn-paid" class="btn btn-success float-right mb-5" style="width: 30%;">
+						Bayar
+					</button>
+				
+				</div>
+
+				<div class="col-lg-5 mx-auto mb-4">
+				<div class="row mb-2">
+					<div class="col-md-6">
+						<p class="h5 text-muted">Transaksi</p>
+					</div>
+					<div class="col-md-6">
+						<button type="button" class="btn btn-primary btn-sm float-right" @click="detailAdd">
+							Edit | <i class="fas fa-pencil-alt"></i>
+						</button>
+					</div>
+				</div>
+					<ul class="list-group shadow">
+						<li class="list-group-item" v-if="detailData.length == 0">
+							<div class="media align-items-lg-center flex-column flex-lg-row p-3">
+								<div class="media-body order-2 order-lg-1">
+									<p class="font-italic text-muted mb-0 mr-0 small">
+										Silahkan tambahkan data transaksi terlebih dahulu!
+									</p>
+								</div>
+							</div>
+						</li>
+					</ul>
+					<ul class="list-group shadow">
+						<li class="list-group-item" v-for="(row, detail_idx) in detailData">
+							<div class="media align-items-lg-center flex-column flex-lg-row p-3">
+								<div class="media-body order-2 order-lg-1">
+									<h5 class="mt-0 font-weight-bold mb-2"><% row.number %></h5>
+									<p class="font-italic text-muted mb-0 mr-5 small" v-if="row.type == 'T'">
+										<% row.guest_name %> <% row.guest_telp %> <br>
+										<% row.date_range %><br>
+										<% row.room %>
+										(<% row.room_type %>)<br>
+										<% row.guest_group %>
+										{# <% row.paid %> #}
+									</p>
+									<p class="font-italic text-muted mb-0 mr-5 small" v-if="row.type == 'C'">
+										<% row.guest_name %> <% row.guest_telp %><br>
+										<% row.room %>
+										<% row.room_type %>
+										<ul class="font-italic text-muted mb-0 mr-5 small">
+											<li v-for="(row_d, idx_d) in row.detail_cs"><% row_d.cs_detail_quantity %> <% row_d.cs_name %> (<% formatPrice(row_d.cs_detail_total) %>)</li>
+										</ul>
+									</p>
+									<div class="d-flex align-items-center justify-content-between mt-1">
+										<h6 class="font-weight-bold my-2">Rp. <% row.total %></h6>
+										<span class="badge badge-pill" v-bind:class="row.typecolor"><% row.typeicon %></span>
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		 	
+		</div>
+
+	</section>
+	<!-- /.content -->
+
+	</form>
+
+</div>
+
+<div class="modal fade edit-modal" id="modal-default">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content edit-modal-content">
+			Loading...
+		</div>
+	</div>
+</div>
+
+{% endblock  %}
+
+{% block add_javascript %}
+{{ parent() }}
+
+
+<script type="text/javascript" src="{{ assets_url('assets/js/app/payments/edit.js?') }}"></script>
+
+<script type="text/javascript">
+	window.FORM_EDIT.handleVue();
+	window.INPUT.handleSelect2();
+	window.INPUT.handleMaskCurrency();
+</script>
+{% endblock  %}

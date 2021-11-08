@@ -1,0 +1,1508 @@
+{% extends 'adm/layout.html.twig' %}
+{% block add_css %}
+{{ parent() }}
+<style type="text/css">
+	@media print {
+		@page {
+			size: a4 landscape;
+		}
+	}
+	
+	/* .wrap-header {} */
+
+	.wrap-footer {
+		page-break-inside: avoid;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="content-wrapper" id="vue-master">
+
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h4>{{ content_title }}</h4>
+				</div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item">Beranda</li>
+						<li class="breadcrumb-item">Laporan</li>
+						<li class="breadcrumb-item"><a href="#">Kasir</a></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+
+				<div class="col-md-12">
+
+					<div class="card card-default">
+						<!-- <div class="card-header">
+							<h3 class="card-title">Data</h3>
+						</div> -->
+						<div class="card-body">
+
+							<div class="row">
+
+								<div class="col-md-3">
+									<div class="form-group">
+										<label>Tahun</label>
+											<input type="text" class="form-control year_filter" pattern="\d*" maxlength="4">
+									</div>
+								</div>
+
+								{# <div class="col-md-3">
+									<div class="form-group">
+										<label>Sampai Tanggal</label>
+										<input type="date" class="form-control date_2" tabindex="4">
+									</div>
+								</div> #}
+
+								{# <div class="col-md-3">
+								<div class="form-group">
+								<label class="control-label">Shift</label>
+								<select class="form-control select2 shift" name="shift" tabindex="5">
+									<option value="">- Pilih -</option>
+									{% if shift_data %}
+									{% for shift_row in shift_data %}
+									<option value="{{ shift_row.shift_id }}"
+										{% if same(shift_row.shift_id, check_array_key(header_data, 'shift_id')) %}
+										selected="selected" {% endif %}>{{ shift_row.shift_name }} ({{ shift_row.shift_time }})</option>
+									{% endfor %}
+									{% endif %}
+								</select>
+								</div>
+
+								
+								</div> #}
+
+							</div>
+							
+							<div class="btn-group float-right" role="group" aria-label="Basic example" style="width: 30%;">
+								<button class="btn btn-primary float-right" style="width: 100%;" id="button-print">
+									<i class="fas fa-print"></i> &nbsp; Print
+								</button>
+								<button class="btn btn-warning float-right" style="width: 100%;" @click="getData()">
+									<i class="fas fa-sync-alt"></i> &nbsp; Proses
+								</button>
+							</div>
+
+							{# <button class="btn btn-info float-right" style="width: 10%; margin-left: .5%;" @click="getData()">
+								<i class="fas fa-sync-alt"></i> &nbsp; Proses
+							</button>
+
+							<div class="btn-group float-right" role="group" aria-label="Basic example" style="width: 30%;">
+								<button class="btn btn-success float-right" style="width: 100%;" id="button-print">
+									<i class="fas fa-print"></i> &nbsp; Print
+								</button>
+								<button class="btn btn-success float-right" style="width: 100%;" @click="exportExcel()">
+									<i class="far fa-file-excel"></i> &nbsp; Export Excel
+								</button>
+							</div> #}
+						</div>
+					</div>
+
+					<div class="card card-default">
+						<div class="card-body" id="master-content">
+
+							<div class="wrap-header">
+								<h2 align="left">Rekap</h2>
+
+							<table class="table table-bordered table-sm" style="font-size: 15px; width:100%;">
+								<thead>
+									<tr class="bg-light">
+										<th width="5%">
+											<% year_text %>
+										</th>
+										<th width="1%">
+											
+										</th>
+										<th width="5%">
+											Jan
+										</th>
+										<th width="1%">
+											
+										</th>
+										<th width="5%">
+											Feb
+										</th>
+										<th width="1%">
+											
+										</th>
+										<th width="5%">
+											Mar
+										</th>
+										<th width="1%">
+											
+										</th>
+										<th width="5%">
+											Apr
+										</th>
+										<th width="1%">
+											
+										</th>
+										<th width="5%">
+											Mei
+										</th>
+										<th width="1%">
+											
+										</th>
+										<th width="5%">
+											Jun
+										</th>
+										<th width="1%">
+											
+										</th>
+										<th width="5%">
+											Jul
+										</th>
+										<th width="1%">
+											
+										</th>
+										<th width="5%">
+											Agu
+										</th>
+										<th width="1%">
+											
+										</th>
+										<th width="5%">
+											Sep
+										</th>
+										<th width="1%">
+											
+										</th>
+										<th width="5%">
+											Okt
+										</th>
+										<th width="1%">
+											
+										</th>
+										<th width="5%">
+											Nov
+										</th>
+										<th width="1%">
+											
+										</th>
+										<th width="5%">
+											Des
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+								{# ROOM #}
+									<tr><td colspan="25"></td></tr>
+									<tr><td class="bold" colspan="25">Room</td>
+									</tr>
+									<tr v-for="(row, detail_idx) in dataRoom" v-if="dataRoom.length > 0">
+										<td>
+											<% row.group_name %>
+										</td>
+										<td align="right">
+											<% row.cou_jan %>
+										</td>
+										<td align="right">
+											<% row.sum_jan %>
+										</td>
+										<td align="right">
+											<% row.cou_feb %>
+										</td>
+										<td align="right">
+											<% row.sum_feb %>
+										</td>
+										<td align="right">
+											<% row.cou_mar %>
+										</td>
+										<td align="right">
+											<% row.sum_mar %>
+										</td>
+										<td align="right">
+											<% row.cou_apr %>
+										</td>
+										<td align="right">
+											<% row.sum_apr %>
+										</td>
+										<td align="right">
+											<% row.cou_mei %>
+										</td>
+										<td align="right">
+											<% row.sum_mei %>
+										</td>
+										<td align="right">
+											<% row.cou_jun %>
+										</td>
+										<td align="right">
+											<% row.sum_jun %>
+										</td>
+										<td align="right">
+											<% row.cou_jul %>
+										</td>
+										<td align="right">
+											<% row.sum_jul %>
+										</td>
+										<td align="right">
+											<% row.cou_agu %>
+										</td>
+										<td align="right">
+											<% row.sum_agu %>
+										</td>
+										<td align="right">
+											<% row.cou_sep %>
+										</td>
+										<td align="right">
+											<% row.sum_sep %>
+										</td>
+										<td align="right">
+											<% row.cou_okt %>
+										</td>
+										<td align="right">
+											<% row.sum_okt %>
+										</td>
+										<td align="right">
+											<% row.cou_nov %>
+										</td>
+										<td align="right">
+											<% row.sum_nov %>
+										</td>
+										<td align="right">
+											<% row.cou_des %>
+										</td>
+										<td align="right">
+											<% row.sum_des %>
+										</td>
+									</tr>
+									<tr class="bold">
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% tc_jan %>
+										</td>
+										<td align="right">
+											<% ts_jan %>
+										</td>
+										<td align="right">
+											<% tc_feb %>
+										</td>
+										<td align="right">
+											<% ts_feb %>
+										</td>
+										<td align="right">
+											<% tc_mar %>
+										</td>
+										<td align="right">
+											<% ts_mar %>
+										</td>
+										<td align="right">
+											<% tc_apr %>
+										</td>
+										<td align="right">
+											<% ts_apr %>
+										</td>
+										<td align="right">
+											<% tc_mei %>
+										</td>
+										<td align="right">
+											<% ts_mei %>
+										</td>
+										<td align="right">
+											<% tc_jun %>
+										</td>
+										<td align="right">
+											<% ts_jun %>
+										</td>
+										<td align="right">
+											<% tc_jul %>
+										</td>
+										<td align="right">
+											<% ts_jul %>
+										</td>
+										<td align="right">
+											<% tc_agu %>
+										</td>
+										<td align="right">
+											<% ts_agu %>
+										</td>
+										<td align="right">
+											<% tc_sep %>
+										</td>
+										<td align="right">
+											<% ts_sep %>
+										</td>
+										<td align="right">
+											<% tc_okt %>
+										</td>
+										<td align="right">
+											<% ts_okt %>
+										</td>
+										<td align="right">
+											<% tc_nov %>
+										</td>
+										<td align="right">
+											<% ts_nov %>
+										</td>
+										<td align="right">
+											<% tc_des %>
+										</td>
+										<td align="right">
+											<% ts_des %>
+										</td>
+									</tr>
+									<tr><td colspan="25"></td></tr>
+									<tr>
+										<td>
+											Pax
+										</td>
+										<td align="right">
+											<% px_jan %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% px_feb %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% px_mar %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% px_apr %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% px_mei %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% px_jun %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% px_jul %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% px_agu %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% px_sep %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% px_okt %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% px_nov %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% px_des %>
+										</td>
+										<td align="right">
+											
+										</td>
+									</tr>
+									<tr>
+										<td>
+											Hotel Room
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% ts_jan %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% ts_feb %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% ts_mar %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% ts_apr %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% ts_mei %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% ts_jun %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% ts_jul %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% ts_agu %>
+										</td>
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% ts_sep %>
+										</td>
+										<td align="right">
+											<% tc_okt %>
+										</td>
+										<td align="right">
+											<% ts_okt %>
+										</td>
+										<td align="right">
+											<% tc_nov %>
+										</td>
+										<td align="right">
+											<% ts_nov %>
+										</td>
+										<td align="right">
+											<% tc_des %>
+										</td>
+										<td align="right">
+											<% ts_des %>
+										</td>
+									</tr>
+									<tr><td colspan="25"></td></tr>
+									<tr class="bold">
+										<td>
+											Residence
+										</td>
+										<td align="right">
+											<% tc_rsd_jan %>
+										</td>
+										<td align="right">
+											<% ts_rsd_jan %>
+										</td>
+										<td align="right">
+											<% tc_rsd_feb %>
+										</td>
+										<td align="right">
+											<% ts_rsd_feb %>
+										</td>
+										<td align="right">
+											<% tc_rsd_mar %>
+										</td>
+										<td align="right">
+											<% ts_rsd_mar %>
+										</td>
+										<td align="right">
+											<% tc_rsd_apr %>
+										</td>
+										<td align="right">
+											<% ts_rsd_apr %>
+										</td>
+										<td align="right">
+											<% tc_rsd_mei %>
+										</td>
+										<td align="right">
+											<% ts_rsd_mei %>
+										</td>
+										<td align="right">
+											<% tc_rsd_jun %>
+										</td>
+										<td align="right">
+											<% ts_rsd_jun %>
+										</td>
+										<td align="right">
+											<% tc_rsd_jul %>
+										</td>
+										<td align="right">
+											<% ts_rsd_jul %>
+										</td>
+										<td align="right">
+											<% tc_rsd_agu %>
+										</td>
+										<td align="right">
+											<% ts_rsd_agu %>
+										</td>
+										<td align="right">
+											<% tc_rsd_sep %>
+										</td>
+										<td align="right">
+											<% ts_rsd_sep %>
+										</td>
+										<td align="right">
+											<% tc_rsd_okt %>
+										</td>
+										<td align="right">
+											<% ts_rsd_okt %>
+										</td>
+										<td align="right">
+											<% tc_rsd_nov %>
+										</td>
+										<td align="right">
+											<% ts_rsd_nov %>
+										</td>
+										<td align="right">
+											<% tc_rsd_des %>
+										</td>
+										<td align="right">
+											<% ts_rsd_des %>
+										</td>
+									</tr>
+									<tr><td colspan="25"></td></tr>
+									<tr><td class="bold" colspan="25">Meeting</td>
+									</tr>
+									<tr v-for="(row, detail_idx) in dataMeeting" v-if="dataMeeting.length > 0">
+										<td>
+											<% row.group_name %>
+										</td>
+										<td align="right">
+											<% row.cou_jan %>
+										</td>
+										<td align="right">
+											<% row.sum_jan %>
+										</td>
+										<td align="right">
+											<% row.cou_feb %>
+										</td>
+										<td align="right">
+											<% row.sum_feb %>
+										</td>
+										<td align="right">
+											<% row.cou_mar %>
+										</td>
+										<td align="right">
+											<% row.sum_mar %>
+										</td>
+										<td align="right">
+											<% row.cou_apr %>
+										</td>
+										<td align="right">
+											<% row.sum_apr %>
+										</td>
+										<td align="right">
+											<% row.cou_mei %>
+										</td>
+										<td align="right">
+											<% row.sum_mei %>
+										</td>
+										<td align="right">
+											<% row.cou_jun %>
+										</td>
+										<td align="right">
+											<% row.sum_jun %>
+										</td>
+										<td align="right">
+											<% row.cou_jul %>
+										</td>
+										<td align="right">
+											<% row.sum_jul %>
+										</td>
+										<td align="right">
+											<% row.cou_agu %>
+										</td>
+										<td align="right">
+											<% row.sum_agu %>
+										</td>
+										<td align="right">
+											<% row.cou_sep %>
+										</td>
+										<td align="right">
+											<% row.sum_sep %>
+										</td>
+										<td align="right">
+											<% row.cou_okt %>
+										</td>
+										<td align="right">
+											<% row.sum_okt %>
+										</td>
+										<td align="right">
+											<% row.cou_nov %>
+										</td>
+										<td align="right">
+											<% row.sum_nov %>
+										</td>
+										<td align="right">
+											<% row.cou_des %>
+										</td>
+										<td align="right">
+											<% row.sum_des %>
+										</td>
+									</tr>
+									<tr class="bold">
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% tc_mee_jan %>
+										</td>
+										<td align="right">
+											<% ts_mee_jan %>
+										</td>
+										<td align="right">
+											<% tc_mee_feb %>
+										</td>
+										<td align="right">
+											<% ts_mee_feb %>
+										</td>
+										<td align="right">
+											<% tc_mee_mar %>
+										</td>
+										<td align="right">
+											<% ts_mee_mar %>
+										</td>
+										<td align="right">
+											<% tc_mee_apr %>
+										</td>
+										<td align="right">
+											<% ts_mee_apr %>
+										</td>
+										<td align="right">
+											<% tc_mee_mei %>
+										</td>
+										<td align="right">
+											<% ts_mee_mei %>
+										</td>
+										<td align="right">
+											<% tc_mee_jun %>
+										</td>
+										<td align="right">
+											<% ts_mee_jun %>
+										</td>
+										<td align="right">
+											<% tc_mee_jul %>
+										</td>
+										<td align="right">
+											<% ts_mee_jul %>
+										</td>
+										<td align="right">
+											<% tc_mee_agu %>
+										</td>
+										<td align="right">
+											<% ts_mee_agu %>
+										</td>
+										<td align="right">
+											<% tc_mee_sep %>
+										</td>
+										<td align="right">
+											<% ts_mee_sep %>
+										</td>
+										<td align="right">
+											<% tc_mee_okt %>
+										</td>
+										<td align="right">
+											<% ts_mee_okt %>
+										</td>
+										<td align="right">
+											<% tc_mee_nov %>
+										</td>
+										<td align="right">
+											<% ts_mee_nov %>
+										</td>
+										<td align="right">
+											<% tc_mee_des %>
+										</td>
+										<td align="right">
+											<% ts_mee_des %>
+										</td>
+									</tr>
+									<tr><td colspan="25"></td></tr>
+									<tr><td class="bold" colspan="25">Poolside</td>
+									</tr>
+									<tr v-for="(row, detail_idx) in dataPoolside" v-if="dataPoolside.length > 0">
+										<td>
+											<% row.group_name %>
+										</td>
+										<td align="right">
+											<% row.cou_jan %>
+										</td>
+										<td align="right">
+											<% row.sum_jan %>
+										</td>
+										<td align="right">
+											<% row.cou_feb %>
+										</td>
+										<td align="right">
+											<% row.sum_feb %>
+										</td>
+										<td align="right">
+											<% row.cou_mar %>
+										</td>
+										<td align="right">
+											<% row.sum_mar %>
+										</td>
+										<td align="right">
+											<% row.cou_apr %>
+										</td>
+										<td align="right">
+											<% row.sum_apr %>
+										</td>
+										<td align="right">
+											<% row.cou_mei %>
+										</td>
+										<td align="right">
+											<% row.sum_mei %>
+										</td>
+										<td align="right">
+											<% row.cou_jun %>
+										</td>
+										<td align="right">
+											<% row.sum_jun %>
+										</td>
+										<td align="right">
+											<% row.cou_jul %>
+										</td>
+										<td align="right">
+											<% row.sum_jul %>
+										</td>
+										<td align="right">
+											<% row.cou_agu %>
+										</td>
+										<td align="right">
+											<% row.sum_agu %>
+										</td>
+										<td align="right">
+											<% row.cou_sep %>
+										</td>
+										<td align="right">
+											<% row.sum_sep %>
+										</td>
+										<td align="right">
+											<% row.cou_okt %>
+										</td>
+										<td align="right">
+											<% row.sum_okt %>
+										</td>
+										<td align="right">
+											<% row.cou_nov %>
+										</td>
+										<td align="right">
+											<% row.sum_nov %>
+										</td>
+										<td align="right">
+											<% row.cou_des %>
+										</td>
+										<td align="right">
+											<% row.sum_des %>
+										</td>
+									</tr>
+									<tr class="bold">
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% tc_poo_jan %>
+										</td>
+										<td align="right">
+											<% ts_poo_jan %>
+										</td>
+										<td align="right">
+											<% tc_poo_feb %>
+										</td>
+										<td align="right">
+											<% ts_poo_feb %>
+										</td>
+										<td align="right">
+											<% tc_poo_mar %>
+										</td>
+										<td align="right">
+											<% ts_poo_mar %>
+										</td>
+										<td align="right">
+											<% tc_poo_apr %>
+										</td>
+										<td align="right">
+											<% ts_poo_apr %>
+										</td>
+										<td align="right">
+											<% tc_poo_mei %>
+										</td>
+										<td align="right">
+											<% ts_poo_mei %>
+										</td>
+										<td align="right">
+											<% tc_poo_jun %>
+										</td>
+										<td align="right">
+											<% ts_poo_jun %>
+										</td>
+										<td align="right">
+											<% tc_poo_jul %>
+										</td>
+										<td align="right">
+											<% ts_poo_jul %>
+										</td>
+										<td align="right">
+											<% tc_poo_agu %>
+										</td>
+										<td align="right">
+											<% ts_poo_agu %>
+										</td>
+										<td align="right">
+											<% tc_poo_sep %>
+										</td>
+										<td align="right">
+											<% ts_poo_sep %>
+										</td>
+										<td align="right">
+											<% tc_poo_okt %>
+										</td>
+										<td align="right">
+											<% ts_poo_okt %>
+										</td>
+										<td align="right">
+											<% tc_poo_nov %>
+										</td>
+										<td align="right">
+											<% ts_poo_nov %>
+										</td>
+										<td align="right">
+											<% tc_poo_des %>
+										</td>
+										<td align="right">
+											<% ts_poo_des %>
+										</td>
+									</tr>
+									<tr><td colspan="25"></td></tr>
+									<tr><td class="bold" colspan="25">Resto/Food Beverages</td>
+									</tr>
+									<tr v-for="(row, detail_idx) in dataResto" v-if="dataResto.length > 0">
+										<td>
+											<% row.group_name %>
+										</td>
+										<td align="right">
+											<% row.cou_jan %>
+										</td>
+										<td align="right">
+											<% row.sum_jan %>
+										</td>
+										<td align="right">
+											<% row.cou_feb %>
+										</td>
+										<td align="right">
+											<% row.sum_feb %>
+										</td>
+										<td align="right">
+											<% row.cou_mar %>
+										</td>
+										<td align="right">
+											<% row.sum_mar %>
+										</td>
+										<td align="right">
+											<% row.cou_apr %>
+										</td>
+										<td align="right">
+											<% row.sum_apr %>
+										</td>
+										<td align="right">
+											<% row.cou_mei %>
+										</td>
+										<td align="right">
+											<% row.sum_mei %>
+										</td>
+										<td align="right">
+											<% row.cou_jun %>
+										</td>
+										<td align="right">
+											<% row.sum_jun %>
+										</td>
+										<td align="right">
+											<% row.cou_jul %>
+										</td>
+										<td align="right">
+											<% row.sum_jul %>
+										</td>
+										<td align="right">
+											<% row.cou_agu %>
+										</td>
+										<td align="right">
+											<% row.sum_agu %>
+										</td>
+										<td align="right">
+											<% row.cou_sep %>
+										</td>
+										<td align="right">
+											<% row.sum_sep %>
+										</td>
+										<td align="right">
+											<% row.cou_okt %>
+										</td>
+										<td align="right">
+											<% row.sum_okt %>
+										</td>
+										<td align="right">
+											<% row.cou_nov %>
+										</td>
+										<td align="right">
+											<% row.sum_nov %>
+										</td>
+										<td align="right">
+											<% row.cou_des %>
+										</td>
+										<td align="right">
+											<% row.sum_des %>
+										</td>
+									</tr>
+									<tr class="bold">
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% tc_res_jan %>
+										</td>
+										<td align="right">
+											<% ts_res_jan %>
+										</td>
+										<td align="right">
+											<% tc_res_feb %>
+										</td>
+										<td align="right">
+											<% ts_res_feb %>
+										</td>
+										<td align="right">
+											<% tc_res_mar %>
+										</td>
+										<td align="right">
+											<% ts_res_mar %>
+										</td>
+										<td align="right">
+											<% tc_res_apr %>
+										</td>
+										<td align="right">
+											<% ts_res_apr %>
+										</td>
+										<td align="right">
+											<% tc_res_mei %>
+										</td>
+										<td align="right">
+											<% ts_res_mei %>
+										</td>
+										<td align="right">
+											<% tc_res_jun %>
+										</td>
+										<td align="right">
+											<% ts_res_jun %>
+										</td>
+										<td align="right">
+											<% tc_res_jul %>
+										</td>
+										<td align="right">
+											<% ts_res_jul %>
+										</td>
+										<td align="right">
+											<% tc_res_agu %>
+										</td>
+										<td align="right">
+											<% ts_res_agu %>
+										</td>
+										<td align="right">
+											<% tc_res_sep %>
+										</td>
+										<td align="right">
+											<% ts_res_sep %>
+										</td>
+										<td align="right">
+											<% tc_res_okt %>
+										</td>
+										<td align="right">
+											<% ts_res_okt %>
+										</td>
+										<td align="right">
+											<% tc_res_nov %>
+										</td>
+										<td align="right">
+											<% ts_res_nov %>
+										</td>
+										<td align="right">
+											<% tc_res_des %>
+										</td>
+										<td align="right">
+											<% ts_res_des %>
+										</td>
+									</tr>
+									<tr><td colspan="25"></td></tr>
+									<tr><td class="bold" colspan="25">Mischarge</td>
+									</tr>
+									<tr v-for="(row, detail_idx) in dataMischarge" v-if="dataMischarge.length > 0">
+										<td>
+											<% row.group_name %>
+										</td>
+										<td align="right">
+											<% row.cou_jan %>
+										</td>
+										<td align="right">
+											<% row.sum_jan %>
+										</td>
+										<td align="right">
+											<% row.cou_feb %>
+										</td>
+										<td align="right">
+											<% row.sum_feb %>
+										</td>
+										<td align="right">
+											<% row.cou_mar %>
+										</td>
+										<td align="right">
+											<% row.sum_mar %>
+										</td>
+										<td align="right">
+											<% row.cou_apr %>
+										</td>
+										<td align="right">
+											<% row.sum_apr %>
+										</td>
+										<td align="right">
+											<% row.cou_mei %>
+										</td>
+										<td align="right">
+											<% row.sum_mei %>
+										</td>
+										<td align="right">
+											<% row.cou_jun %>
+										</td>
+										<td align="right">
+											<% row.sum_jun %>
+										</td>
+										<td align="right">
+											<% row.cou_jul %>
+										</td>
+										<td align="right">
+											<% row.sum_jul %>
+										</td>
+										<td align="right">
+											<% row.cou_agu %>
+										</td>
+										<td align="right">
+											<% row.sum_agu %>
+										</td>
+										<td align="right">
+											<% row.cou_sep %>
+										</td>
+										<td align="right">
+											<% row.sum_sep %>
+										</td>
+										<td align="right">
+											<% row.cou_okt %>
+										</td>
+										<td align="right">
+											<% row.sum_okt %>
+										</td>
+										<td align="right">
+											<% row.cou_nov %>
+										</td>
+										<td align="right">
+											<% row.sum_nov %>
+										</td>
+										<td align="right">
+											<% row.cou_des %>
+										</td>
+										<td align="right">
+											<% row.sum_des %>
+										</td>
+									</tr>
+									<tr class="bold">
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% tc_mis_jan %>
+										</td>
+										<td align="right">
+											<% ts_mis_jan %>
+										</td>
+										<td align="right">
+											<% tc_mis_feb %>
+										</td>
+										<td align="right">
+											<% ts_mis_feb %>
+										</td>
+										<td align="right">
+											<% tc_mis_mar %>
+										</td>
+										<td align="right">
+											<% ts_mis_mar %>
+										</td>
+										<td align="right">
+											<% tc_mis_apr %>
+										</td>
+										<td align="right">
+											<% ts_mis_apr %>
+										</td>
+										<td align="right">
+											<% tc_mis_mei %>
+										</td>
+										<td align="right">
+											<% ts_mis_mei %>
+										</td>
+										<td align="right">
+											<% tc_mis_jun %>
+										</td>
+										<td align="right">
+											<% ts_mis_jun %>
+										</td>
+										<td align="right">
+											<% tc_mis_jul %>
+										</td>
+										<td align="right">
+											<% ts_mis_jul %>
+										</td>
+										<td align="right">
+											<% tc_mis_agu %>
+										</td>
+										<td align="right">
+											<% ts_mis_agu %>
+										</td>
+										<td align="right">
+											<% tc_mis_sep %>
+										</td>
+										<td align="right">
+											<% ts_mis_sep %>
+										</td>
+										<td align="right">
+											<% tc_mis_okt %>
+										</td>
+										<td align="right">
+											<% ts_mis_okt %>
+										</td>
+										<td align="right">
+											<% tc_mis_nov %>
+										</td>
+										<td align="right">
+											<% ts_mis_nov %>
+										</td>
+										<td align="right">
+											<% tc_mis_des %>
+										</td>
+										<td align="right">
+											<% ts_mis_des %>
+										</td>
+									</tr>
+									<tr><td colspan="25"></td></tr>
+									<tr><td class="bold" colspan="25">Swimming Pool</td>
+									</tr>
+									<tr v-for="(row, detail_idx) in dataSwimming" v-if="dataSwimming.length > 0">
+										<td>
+											<% row.group_name %>
+										</td>
+										<td align="right">
+											<% row.cou_jan %>
+										</td>
+										<td align="right">
+											<% row.sum_jan %>
+										</td>
+										<td align="right">
+											<% row.cou_feb %>
+										</td>
+										<td align="right">
+											<% row.sum_feb %>
+										</td>
+										<td align="right">
+											<% row.cou_mar %>
+										</td>
+										<td align="right">
+											<% row.sum_mar %>
+										</td>
+										<td align="right">
+											<% row.cou_apr %>
+										</td>
+										<td align="right">
+											<% row.sum_apr %>
+										</td>
+										<td align="right">
+											<% row.cou_mei %>
+										</td>
+										<td align="right">
+											<% row.sum_mei %>
+										</td>
+										<td align="right">
+											<% row.cou_jun %>
+										</td>
+										<td align="right">
+											<% row.sum_jun %>
+										</td>
+										<td align="right">
+											<% row.cou_jul %>
+										</td>
+										<td align="right">
+											<% row.sum_jul %>
+										</td>
+										<td align="right">
+											<% row.cou_agu %>
+										</td>
+										<td align="right">
+											<% row.sum_agu %>
+										</td>
+										<td align="right">
+											<% row.cou_sep %>
+										</td>
+										<td align="right">
+											<% row.sum_sep %>
+										</td>
+										<td align="right">
+											<% row.cou_okt %>
+										</td>
+										<td align="right">
+											<% row.sum_okt %>
+										</td>
+										<td align="right">
+											<% row.cou_nov %>
+										</td>
+										<td align="right">
+											<% row.sum_nov %>
+										</td>
+										<td align="right">
+											<% row.cou_des %>
+										</td>
+										<td align="right">
+											<% row.sum_des %>
+										</td>
+									</tr>
+									<tr class="bold">
+										<td align="right">
+											
+										</td>
+										<td align="right">
+											<% tc_swi_jan %>
+										</td>
+										<td align="right">
+											<% ts_swi_jan %>
+										</td>
+										<td align="right">
+											<% tc_swi_feb %>
+										</td>
+										<td align="right">
+											<% ts_swi_feb %>
+										</td>
+										<td align="right">
+											<% tc_swi_mar %>
+										</td>
+										<td align="right">
+											<% ts_swi_mar %>
+										</td>
+										<td align="right">
+											<% tc_swi_apr %>
+										</td>
+										<td align="right">
+											<% ts_swi_apr %>
+										</td>
+										<td align="right">
+											<% tc_swi_mei %>
+										</td>
+										<td align="right">
+											<% ts_swi_mei %>
+										</td>
+										<td align="right">
+											<% tc_swi_jun %>
+										</td>
+										<td align="right">
+											<% ts_swi_jun %>
+										</td>
+										<td align="right">
+											<% tc_swi_jul %>
+										</td>
+										<td align="right">
+											<% ts_swi_jul %>
+										</td>
+										<td align="right">
+											<% tc_swi_agu %>
+										</td>
+										<td align="right">
+											<% ts_swi_agu %>
+										</td>
+										<td align="right">
+											<% tc_swi_sep %>
+										</td>
+										<td align="right">
+											<% ts_swi_sep %>
+										</td>
+										<td align="right">
+											<% tc_swi_okt %>
+										</td>
+										<td align="right">
+											<% ts_swi_okt %>
+										</td>
+										<td align="right">
+											<% tc_swi_nov %>
+										</td>
+										<td align="right">
+											<% ts_swi_nov %>
+										</td>
+										<td align="right">
+											<% tc_swi_des %>
+										</td>
+										<td align="right">
+											<% ts_swi_des %>
+										</td>
+									</tr>
+									<tr><td colspan="25"></td></tr>
+									<tr class="bold">
+										<td align="right">
+											Total
+										</td>
+										<td align="right">
+										</td>
+										<td align="right">
+											<% ttl_jan %>
+										</td>
+										<td align="right">
+										</td>
+										<td align="right">
+											<% ttl_feb %>
+										</td>
+										<td align="right">
+										</td>
+										<td align="right">
+											<% ttl_mar %>
+										</td>
+										<td align="right">
+										</td>
+										<td align="right">
+											<% ttl_apr %>
+										</td>
+										<td align="right">
+										</td>
+										<td align="right">
+											<% ttl_mei %>
+										</td>
+										<td align="right">
+										</td>
+										<td align="right">
+											<% ttl_jun %>
+										</td>
+										<td align="right">
+										</td>
+										<td align="right">
+											<% ttl_jul %>
+										</td>
+										<td align="right">
+										</td>
+										<td align="right">
+											<% ttl_agu %>
+										</td>
+										<td align="right">
+										</td>
+										<td align="right">
+											<% ttl_sep %>
+										</td>
+										<td align="right">
+										</td>
+										<td align="right">
+											<% ttl_okt %>
+										</td>
+										<td align="right">
+										</td>
+										<td align="right">
+											<% ttl_nov %>
+										</td>
+										<td align="right">
+										</td>
+										<td align="right">
+											<% ttl_des %>
+										</td>
+									</tr>
+								{# ROOM #}
+								</tbody>
+								<tbody v-if="dataRoom.length == 0">
+									<tr>
+										<td colspan="8">
+											Tidak ada data yang tersedia pada tabel ini
+										</td>
+									</tr>
+								</tbody>
+								<tfoot class="bold">
+									
+								</tfoot>
+							</table>
+
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+			<!-- /.row -->
+		</div><!-- /.container-fluid -->
+	</section>
+	<!-- /.content -->
+
+</div>
+
+{% endblock  %}
+
+{% block add_javascript %}
+{{ parent() }}
+
+<script type="text/javascript">
+	jQuery(function($) {
+
+    // Function available at https://gist.github.com/sixlive/55b9630cc105676f842c
+
+    $.fn.printDiv = function() {
+      var printContents = $(this).html();
+      var originalContents = $('body').html();
+      $('body').html(printContents);
+      $('body').addClass('js-print');
+      window.print();
+      $('body').html(originalContents);
+      $('body').removeClass('js-print');
+    };
+
+    // Print
+    $('#button-print').click(function() {
+      $('#master-content').printDiv();
+      setTimeout(function(){
+        window.close()
+        location.reload();
+      },10);
+    });
+
+  });
+</script>
+
+<script type="text/javascript" src="{{ assets_url('assets/js/app/report/r_recaps.js?') }}"></script>
+<script type="text/javascript">
+	window.REPORT.init();
+	window.DATETIME.initDatePicker();
+	window.INPUT.handleSelect2();
+</script>
+{% endblock  %}

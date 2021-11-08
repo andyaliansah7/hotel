@@ -1,0 +1,74 @@
+<form class="master-form" action="{{ site_url('adm/payment_methods/save') }}" method="POST">
+
+	<div class="modal-header">
+		<h5 class="modal-title">{{ content_title }}</h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+
+	<div class="modal-body">
+		<input class="form-control" name="id" value="{{ id }}" type="hidden">
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Nama Metode Pembayaran</label>
+					<input type="text" class="form-control" id="namecheck" name="name" tabindex="1" placeholder="Credit Card"
+						value="{{ check_array_key(get_data, 'payment_method_name') }}" required="required">
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<select class="form-control select2" name="type" tabindex="2" required="required">
+					<option value="">- Pilih -</option>
+					<option value="Kartu"
+						{% if same('Kartu', check_array_key(get_data, 'payment_method_type')) %}
+						selected="selected" {% endif %}>Kartu
+					</option>
+					<option value="Tunai"
+						{% if same('Tunai', check_array_key(get_data, 'payment_method_type')) %}
+						selected="selected" {% endif %}>Tunai
+					</option>
+					<option value="Transfer"
+						{% if same('Transfer', check_array_key(get_data, 'payment_method_type')) %}
+						selected="selected" {% endif %}>Transfer
+					</option>
+				</select>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default waves-effect master-cancel" data-dismiss="modal">Batal</button>
+
+		<div class="btn-group" role="group">
+	        <button name="action" value="save" class="btn btn-primary btn-save" type="submit">
+	        	Simpan
+	        </button>
+	        <button type="button" class="btn btn-primary btn-save dropdown-toggle" data-toggle="dropdown"
+	        	aria-haspopup="true" aria-expanded="false">
+	        </button>
+			<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+				<!-- <a class="dropdown-item" href="#">Dropdown link</a> -->
+				<button class="dropdown-item" name="action" value="save_new" type="submit" href="#">Simpan &amp; Baru</button>
+				<button class="dropdown-item" name="action" value="save_close" type="submit" href="#">Simpan &amp; Tutup</button>
+			</div>
+		</div>
+	</div>
+
+</form>
+
+<script type="text/javascript">
+
+	var elDivID = "#namecheck";
+	var elResult = ".result_check";
+	var elUrl = "{{ site_url('adm/payment_methods/check_id') }}";
+	var elBtn = ".btn-save";
+
+	window.FORM.handleCheckField2(elDivID, elResult, elUrl, elBtn, "", "");
+	window.INPUT.handleSelect2();
+	window.INPUT.handleMaskCurrency();
+
+</script>

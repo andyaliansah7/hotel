@@ -1,0 +1,80 @@
+<form class="master-form" action="{{ site_url('adm/users/save') }}" method="POST">
+
+	<div class="modal-header">
+		<h5 class="modal-title">{{ content_title }}</h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+
+	<div class="modal-body">
+		<input class="form-control" name="id" value="{{ id }}" type="hidden">
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Username</label>
+					<input type="text" class="form-control" id="namecheck" name="username" tabindex="1"
+						value="{{ check_array_key(get_data, 'username') }}" required="required">
+				</div>
+
+				<div class="form-group">
+					<label class="control-label">Password</label>
+					<input type="password" class="form-control" name="password" tabindex="2" required="required">
+				</div>
+
+				<div class="form-group">
+					<label class="control-label">Nama Lengkap</label>
+					<input type="text" class="form-control" name="fullname" tabindex="3"
+						value="{{ check_array_key(get_data, 'fullname') }}" required="required">
+				</div>
+
+				<div class="form-group">
+					<label>Role</label>
+					<select class="form-control select2" name="role" tabindex="4" required="required">
+						<option value="">- Pilih -</option>
+						{% if role_data %}
+						{% for role_row in role_data %}
+						<option value="{{ role_row.role_id }}" {% if same(role_row.role_id, check_array_key(get_data, 'role')) %}
+							selected="selected" {% endif %}>
+							{{ role_row.role_name }}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default waves-effect master-cancel" data-dismiss="modal">Batal</button>
+
+		<div class="btn-group" role="group">
+	        <button name="action" value="save" class="btn btn-primary btn-save" type="submit">
+	        	Simpan
+	        </button>
+	        <button type="button" class="btn btn-primary btn-save dropdown-toggle" data-toggle="dropdown"
+	        	aria-haspopup="true" aria-expanded="false">
+	        </button>
+			<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+				<!-- <a class="dropdown-item" href="#">Dropdown link</a> -->
+				<button class="dropdown-item" name="action" value="save_new" type="submit" href="#">Simpan &amp; Baru</button>
+				<button class="dropdown-item" name="action" value="save_close" type="submit" href="#">Simpan &amp; Tutup</button>
+			</div>
+		</div>
+	</div>
+
+</form>
+
+<script type="text/javascript">
+
+	var elDivID = "#namecheck";
+	var elResult = ".result_check";
+	var elUrl = "{{ site_url('adm/users/check_id') }}";
+	var elBtn = ".btn-save";
+
+	window.FORM.handleCheckField2(elDivID, elResult, elUrl, elBtn, "", "");
+	window.INPUT.handleSelect2();
+</script>

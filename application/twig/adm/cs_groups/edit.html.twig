@@ -1,0 +1,70 @@
+<form class="master-form" action="{{ site_url('adm/Cs_groups/save') }}" method="POST">
+
+	<div class="modal-header">
+		<h5 class="modal-title">{{ content_title }}</h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+
+	<div class="modal-body">
+		<input class="form-control" name="id" value="{{ id }}" type="hidden">
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Grup</label>
+					<select class="form-control select2" name="parent_name" tabindex="2" required="required">
+						<option value="">- Pilih -</option>
+						{% if parent_data %}
+						{% for parent_row in parent_data %}
+						<option value="{{ parent_row.cs_group_parent_id }}"
+							{% if same(parent_row.cs_group_parent_id, check_array_key(get_data, 'cs_group_parent_id')) %}
+							selected="selected" {% endif %}>{{ parent_row.cs_group_parent_name }}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Sub Grup</label>
+					<input type="text" class="form-control" id="namecheck" name="child_name" tabindex="1" placeholder="Laundry"
+						value="{{ check_array_key(get_data, 'cs_group_name') }}" required="required">
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default waves-effect master-cancel" data-dismiss="modal">Batal</button>
+
+		<div class="btn-group" role="group">
+	        <button name="action" value="save" class="btn btn-primary btn-save" type="submit">
+	        	Simpan
+	        </button>
+	        <button type="button" class="btn btn-primary btn-save dropdown-toggle" data-toggle="dropdown"
+	        	aria-haspopup="true" aria-expanded="false">
+	        </button>
+			<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+				<!-- <a class="dropdown-item" href="#">Dropdown link</a> -->
+				<button class="dropdown-item" name="action" value="save_new" type="submit" href="#">Simpan &amp; Baru</button>
+				<button class="dropdown-item" name="action" value="save_close" type="submit" href="#">Simpan &amp; Tutup</button>
+			</div>
+		</div>
+	</div>
+
+</form>
+
+<script type="text/javascript">
+
+	var elDivID = "#namecheck";
+	var elResult = ".result_check";
+	var elUrl = "{{ site_url('adm/Cs_groups/check_id') }}";
+	var elBtn = ".btn-save";
+
+	{# window.FORM.handleCheckField2(elDivID, elResult, elUrl, elBtn, "", ""); #}
+	window.INPUT.handleSelect2();
+
+</script>

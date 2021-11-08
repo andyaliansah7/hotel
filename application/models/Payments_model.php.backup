@@ -1,0 +1,89 @@
+<?php
+/**
+ * Payments Model
+ * Modif Core Model with Namespace
+ *
+ * @author Andy Aliansah <andyaliansah97@gmail.com>
+ */
+use core\Model;
+
+class Payments_model extends Model {
+
+	public function payment_autonumber()
+	{	
+		$sql = $this->db;
+
+		$sql->select('RIGHT(t_payment.payment_number, 4) as serial_number', FALSE);
+		$sql->where('MONTH(payment_date) = MONTH(CURRENT_DATE())');
+		$sql->order_by('payment_number', 'DESC');
+		$sql->limit(1);    
+		$query = $sql->get('t_payment');  
+		if($query->num_rows() <> 0){         
+			$data = $query->row();      
+			$serial_number = intval($data->serial_number) + 1;    
+		}
+		else {          
+			$serial_number = 0001;    
+		}
+
+		$serial_number_generate = str_pad($serial_number, 4, "0", STR_PAD_LEFT);
+		$result = $serial_number_generate;
+		return $result;
+	}
+
+	public function get_data($where='') {
+		$sql = $this->db;
+
+		$sql->select('*, 
+			a.id as id,
+			g.payment_method_name as p1_name,
+			h.payment_method_name as p2_name,
+			i.payment_method_name as p3_name,
+		');
+        $sql->from('t_payment a');
+        $sql->join('t_transaction b', 'b.id = a.transaction_id', 'inner');
+        $sql->join('m_guest c', 'c.guest_id = b.guest_id', 'inner');
+        $sql->join('m_guest_group d', 'd.guest_group_id = b.guest_group_id', 'left');
+        $sql->join('m_room_type e', 'e.room_type_id = b.room_type_id', 'inner');
+		$sql->join('m_room f', 'f.room_id = b.room_id', 'inner');
+		
+        $sql->join('m_payment_method g', 'g.payment_method_id = a.payment_method_1', 'left');
+        $sql->join('m_payment_method h', 'h.payment_method_id = a.payment_method_2', 'left');
+        $sql->join('m_payment_method i', 'i.payment_method_id = a.payment_method_3', 'left');
+
+		$sql->order_by('payment_number', 'desc');
+
+		if ($where != "") {
+			$sql->where($where);
+		}
+
+		$get = $sql->get();
+
+		return $get;
+	}
+
+	public function save($data) {
+		return $this->db->insert('t_payment', $data);
+	}
+
+	public function update($id, $data) {
+		$this->db->where('id', $id);
+		return $this->db->update('t_payment', $data);
+	}
+
+	public function delete($id) {
+		$this->db->where('id', $id);
+		return $this->db->delete('t_payment');
+	}
+
+	public function check_id($where) {
+		$this->db->select("*");
+		$this->db->from('t_payment');
+		$this->db->where($where);
+		$query = $this->db->get();
+		return $query->result();
+	}
+
+}
+
+?>

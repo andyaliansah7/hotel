@@ -1,0 +1,487 @@
+<style>
+body {
+    margin-top:40px;
+}
+.stepwizard-step p {
+    margin-top: 10px;
+}
+.stepwizard-row {
+    display: table-row;
+}
+.stepwizard {
+    display: table;
+    width: 100%;
+    position: relative;
+}
+.stepwizard-step button[disabled] {
+    opacity: 1 !important;
+    filter: alpha(opacity=100) !important;
+}
+.stepwizard-row:before {
+    top: 14px;
+    bottom: 0;
+    position: absolute;
+    content: " ";
+    width: 100%;
+    height: 1px;
+    background-color: #ccc;
+    z-order: 0;
+}
+.stepwizard-step {
+    display: table-cell;
+    text-align: center;
+    position: relative;
+}
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+}
+
+</style>
+
+<form class="master-form" action="{{ site_url('adm/payments/save') }}" method="POST">
+
+	<div class="modal-header">
+		<h5 class="modal-title">{{ content_title }}</h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+
+	<div class="modal-body">
+	
+	<div class="stepwizard col-md-offset-3">
+		<div class="stepwizard-row setup-panel">
+			<div class="stepwizard-step">
+				<a href="#step-1" type="button" class="btn btn-primary btn-circle">1</a>
+				<p>Informasi</p>
+			</div>
+			<div class="stepwizard-step">
+				<a href="#step-2" type="button" class="btn btn-default btn-circle" disabled="disabled">2</a>
+				<p>Detail Transaksi</p>
+			</div>
+			<div class="stepwizard-step">
+				<a href="#step-3" type="button" class="btn btn-default btn-circle" disabled="disabled">3</a>
+				<p>Pembayaran</p>
+			</div>
+		</div>
+  	</div>
+
+    <div class="row setup-content" id="step-1">
+		<div class="col-md-12">
+			<input class="form-control" name="id" id="id" value="{{ id }}" type="hidden">
+			<input class="form-control" name="transaction_old_id" id="transaction_old_id" value="{{ check_array_key(get_data, 'transaction_id') }}" type="hidden">
+
+			<div class="form-group">
+				<label class="control-label">Nomor Check-In</label>
+				<select class="form-control select2" id="transaction_id" name="transaction_id" tabindex="1" required="required">
+					<option value="">- Pilih -</option>
+					{% if transaction_data %}
+					{% for transaction_row in transaction_data %}
+					<option value="{{ transaction_row.id }}"
+						{% if same(transaction_row.id, check_array_key(get_data, 'transaction_id')) %}
+						selected="selected" {% endif %}>{{ transaction_row.transaction_number }} | {{ transaction_row.guest_name }} (Nomor Kamar: {{ transaction_row.room_number }})</option>
+					{% endfor %}
+					{% endif %}
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Nama Tamu</label>
+				<input type="text" class="form-control" id="guest_name" name="guest_name" tabindex="2" placeholder="Mr. Aleen Smitham"
+					value="{{ check_array_key(get_data, 'guest_name') }}" readonly="readonly" style="background-color:white">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label" >Telepon</label>
+				<input type="text" class="form-control" id="guest_phone" name="guest_phone" tabindex="3" placeholder="0811 0000 2345"
+					value="{{ check_array_key(get_data, 'guest_phone') }}" readonly="readonly" style="background-color:white">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Alamat</label>
+				<textarea class="form-control" id="guest_address" name="guest_address" tabindex="4" placeholder="Weber Vista Gulgowskiburgh, DE 48529" readonly="readonly" style="background-color:white">{{ check_array_key(get_data, 'guest_address') }}</textarea>
+			</div>
+
+			<hr>
+
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-group">
+						<label class="control-label">Tanggal Masuk</label>
+						<input type="date" class="form-control" id="date_in" name="date_in" tabindex="5" value="{{ check_array_key(get_data, 'date_in') }}" readonly="readonly" style="background-color:white">
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-group">
+						<label class="control-label">Tanggal Keluar</label>
+						<input type="date" class="form-control" id="date_out" name="date_out" tabindex="6" value="{{ check_array_key(get_data, 'date_out') }}" readonly="readonly" style="background-color:white">
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Tipe Kamar</label>
+				<input type="text" class="form-control" id="room_type" name="room_type" tabindex="7"
+					value="{{ check_array_key(get_data, 'room_type_name') }}" readonly="readonly" style="background-color:white">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Nomor Kamar</label>
+				<input type="text" class="form-control" id="room_number" name="room_number" tabindex="8"
+					value="{{ check_array_key(get_data, 'room_number') }}" readonly="readonly" style="background-color:white">
+			</div>
+
+			<button class="btn btn-primary nextBtn float-right" type="button">Selanjutnya</button>
+		</div>
+    </div>
+
+	<div class="row setup-content" id="step-2">
+		<div class="col-md-12">
+			
+			<div class="form-group">
+				<label class="control-label">Sewa Kamar</label>
+				<div class="input-group mt-1">
+				<input type="text" class="form-control currency-mask text-left" id="total_room_price" name="total_room_price" placeholder="0" tabindex="9" 
+				value="{{ to_decimal(check_array_key(get_data, 'total_room_price')) }}" readonly="readonly" style="background-color:white">
+				<div class="input-group-append">
+					<span class="input-group-text" id="day-addon2">{{ check_array_key(get_data, 'interval_stay') }} malam</span>
+				</div>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Diskon</label>
+				<input type="text" class="form-control currency-mask text-left" id="discount" name="discount" tabindex="10" placeholder="0"
+						value="{{ to_decimal(check_array_key(get_data, 'discount')) }}" readonly="readonly" style="background-color:white">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Deposit</label>
+				<input type="text" class="form-control currency-mask text-left" id="deposit" name="deposit" tabindex="11" placeholder="0"
+						value="{{ to_decimal(check_array_key(get_data, 'deposit')) }}" readonly="readonly" style="background-color:white">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Makanan dan Minuman</label>
+				<input type="text" class="form-control currency-mask text-left" id="total_consumption_price" name="total_consumption_price" tabindex="12" placeholder="0"
+						value="{{ to_decimal(check_array_key(get_data, 'total_consumption_price')) }}" readonly="readonly" style="background-color:white">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Layanan</label>
+				<input type="text" class="form-control currency-mask text-left" id="total_service_price" name="total_service_price" tabindex="13" placeholder="0"
+						value="{{ to_decimal(check_array_key(get_data, 'total_service_price')) }}" readonly="readonly" style="background-color:white">
+			</div>
+
+			{# <div class="form-group">
+				<label class="control-label">PPN 10%</label>
+				<input type="text" class="form-control currency-mask text-left" id="tax" name="tax" tabindex="14" placeholder="0"
+						value="{{ to_decimal(check_array_key(get_data, 'tax')) }}" readonly="readonly" style="background-color:white">
+			</div> #}
+			
+
+			<button class="btn btn-default prevBtn float-left" type="button">Sebelumnya</button>
+
+			<button class="btn btn-primary nextBtn float-right" type="button">Selanjutnya</button>
+			
+		</div>
+	</div>
+
+	<div class="row setup-content" id="step-3">
+		<div class="col-md-12">
+			
+			<div class="form-group">
+				<label class="control-label">Grand Total</label>
+				<input type="text" class="form-control currency-mask text-left" id="grand_total" name="grand_total" tabindex="15" placeholder="0"
+						value="{{ to_decimal(check_array_key(get_data, 'grand_total')) }}" readonly="readonly" style="background-color:white">
+			</div>
+
+			<hr>
+
+			<div class="row">
+				<div class="col-md-8">
+					<div class="form-group">
+						<label class="control-label">Jumlah</label>
+						<input type="text" class="form-control currency-mask text-left" id="total_paid_1" name="total_paid_1" tabindex="16" placeholder="0"
+								value="{{ to_decimal(check_array_key(get_data, 'total_paid_1')) }}" required="required">
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label">Metode</label>
+						<select class="form-control select2" name="payment_method_1" tabindex="17" required="required">
+							<option value="">- Pilih -</option>
+							{% if paymethod_data %}
+							{% for paymethod_row in paymethod_data %}
+							<option value="{{ paymethod_row.payment_method_id }}"
+								{% if same(paymethod_row.payment_method_id, check_array_key(get_data, 'payment_method_1')) %}
+								selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+							{% endfor %}
+							{% endif %}
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-8">
+					<div class="form-group">
+						<input type="text" class="form-control currency-mask text-left" id="total_paid_2" name="total_paid_2" tabindex="18" placeholder="0"
+								value="{{ to_decimal(check_array_key(get_data, 'total_paid_2')) }}">
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<select class="form-control select2" name="payment_method_2" tabindex="19">
+							<option value="">- Pilih -</option>
+							{% if paymethod_data %}
+							{% for paymethod_row in paymethod_data %}
+							<option value="{{ paymethod_row.payment_method_id }}"
+								{% if same(paymethod_row.payment_method_id, check_array_key(get_data, 'payment_method_2')) %}
+								selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+							{% endfor %}
+							{% endif %}
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-8">
+					<div class="form-group">
+						<input type="text" class="form-control currency-mask text-left" id="total_paid_3" name="total_paid_3" tabindex="20" placeholder="0"
+								value="{{ to_decimal(check_array_key(get_data, 'total_paid_3')) }}">
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<select class="form-control select2" name="payment_method_3" tabindex="21">
+							<option value="">- Pilih -</option>
+							{% if paymethod_data %}
+							{% for paymethod_row in paymethod_data %}
+							<option value="{{ paymethod_row.payment_method_id }}"
+								{% if same(paymethod_row.payment_method_id, check_array_key(get_data, 'payment_method_3')) %}
+								selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+							{% endfor %}
+							{% endif %}
+						</select>
+					</div>
+				</div>
+			</div>
+			
+			<hr>
+
+			<div class="form-group">
+				<label class="control-label">Total Dibayar</label>
+				<input type="text" class="form-control currency-mask text-left" id="total_paid" name="total_paid" tabindex="22" placeholder="0" readonly="readonly" style="background-color:white">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Selisih</label>
+				<input type="text" class="form-control currency-mask text-left" id="diff" name="diff" tabindex="23" placeholder="0" readonly="readonly" style="background-color:white">
+			</div>
+
+			<button class="btn btn-default prevBtn float-left" type="button">Sebelumnya</button>
+
+			<div class="btn-group float-right">
+				<button type="button" class="btn btn-warning waves-effect master-cancel" data-dismiss="modal">Batal</button>
+				<button class="btn btn-success btn-save float-right" name="action" value="save_close" type="submit">
+					Simpan
+				</button>
+			</div>
+
+		</div>
+	</div>
+	
+	</div>
+
+</form>
+
+<script type="text/javascript">
+
+$(document).ready(function () {
+	var navListItems = $('div.setup-panel div a'),
+			allWells = $('.setup-content'),
+			allNextBtn = $('.nextBtn'),
+			allPrevBtn = $('.prevBtn');
+
+	allWells.hide();
+
+	navListItems.click(function (e) {
+		e.preventDefault();
+		var $target = $($(this).attr('href')),
+				$item = $(this);
+
+		if (!$(this).hasClass('disabled')) {
+			
+			navListItems.removeClass('btn-primary').addClass('btn-default');
+			$item.removeClass('btn-default');
+			$item.addClass('btn-primary');
+
+			
+			allWells.hide();
+			$target.show();
+			$target.find('input:eq(0)').focus();
+		}
+	});
+	
+	allPrevBtn.click(function(){
+		var curStep = $(this).closest(".setup-content"),
+			curStepBtn = curStep.attr("id"),
+			prevStepWizard = $('div.setup-panel div a[href="#' + curStepBtn + '"]').parent().prev().children("a");
+
+			prevStepWizard.removeAttr('disabled').trigger('click');
+	});
+
+	allNextBtn.click(function(){
+		var curStep = $(this).closest(".setup-content"),
+			curStepBtn = curStep.attr("id"),
+			nextStepWizard = $('div.setup-panel div a[href="#' + curStepBtn + '"]').parent().next().children("a"),
+			curInputs = curStep.find("input[type='text'],input[type='url']"),
+			isValid = true;
+
+		{# $(".form-group").removeClass("was-validated");
+		for(var i=0; i<curInputs.length; i++){
+			if (!curInputs[i].validity.valid){
+				isValid = false;
+				$(curInputs[i]).closest(".form-group").addClass("was-validated");
+			}
+		} #}
+
+		if (isValid)
+			nextStepWizard.removeAttr('disabled').trigger('click');
+	});
+
+	$('div.setup-panel div a.btn-primary').trigger('click');
+});
+
+var UrlTransaction   = "{{ site_url('adm/payments/get_transaction') }}";
+
+$("#transaction_id").change(function (e) {
+	var id = $(e.target).val();
+	
+	$.ajax({
+		type: "POST",
+		url: UrlTransaction,
+		dataType: "JSON",
+		data: {
+			id: id
+		},
+		success: function (data) {
+
+			$("#guest_name").val(data.transaction_data['guest_name']);
+			$("#guest_phone").val(data.transaction_data['guest_phone']);
+			$("#guest_address").val(data.transaction_data['guest_address']);
+			$("#date_in").val(data.transaction_data['date_in']);
+			$("#date_out").val(data.transaction_data['date_out']);
+			$("#room_type").val(data.transaction_data['room_type_name']);
+			$("#room_number").val(data.transaction_data['room_number']);
+			var interval = data.transaction_data['interval_stay'].replace(/[^\w\s]/gi, '');
+			document.getElementById("day-addon2").innerHTML = interval +' malam';
+
+			$("#total_room_price").val(data.total_room);			
+			$("#discount").val(data.discount);
+			$("#deposit").val(data.deposit);
+			$("#total_consumption_price").val(data.total_consumption);
+			$("#total_service_price").val(data.total_service);
+			$("#tax").val(data.tax);
+			$("#grand_total").val(data.grand_total);
+
+		},
+	});			
+});
+
+$('#total_paid_1').keyup(function(e) {
+	var total_paid_1 = $(e.target).val().split(',').join('');
+	var total_paid_2 = $("#total_paid_2").val().split(',').join('');
+	var total_paid_3 = $("#total_paid_3").val().split(',').join('');
+	var grand_total  = $("#grand_total").val().split(',').join('');
+	var total        = 0;
+
+	total = Number(total_paid_1) + Number(total_paid_2) + Number(total_paid_3);
+	diff  = total - grand_total;
+
+	$("#total_paid").val(total);
+	$("#diff").val(diff);
+
+	if(total != grand_total){
+		$(".btn-save").attr('disabled', true);
+	}else{
+		$(".btn-save").attr('disabled', false);
+	}
+});
+
+$('#total_paid_2').keyup(function(e) {
+	var total_paid_1 = $("#total_paid_1").val().split(',').join('');
+	var total_paid_2 = $(e.target).val().split(',').join('');
+	var total_paid_3 = $("#total_paid_3").val().split(',').join('');
+	var grand_total  = $("#grand_total").val().split(',').join('');
+	var total        = 0;
+
+	total = Number(total_paid_1) + Number(total_paid_2) + Number(total_paid_3);
+	diff  = total - grand_total;
+
+	$("#total_paid").val(total);
+	$("#diff").val(diff);
+
+	if(total != grand_total){
+		$(".btn-save").attr('disabled', true);
+	}else{
+		$(".btn-save").attr('disabled', false);
+	}
+});
+
+$('#total_paid_3').keyup(function(e) {
+	var total_paid_1 = $("#total_paid_1").val().split(',').join('');
+	var total_paid_2 = $("#total_paid_2").val().split(',').join('');
+	var total_paid_3 = $(e.target).val().split(',').join('');
+	var grand_total  = $("#grand_total").val().split(',').join('');
+	var total        = 0;
+
+	total = Number(total_paid_1) + Number(total_paid_2) + Number(total_paid_3);
+	diff  = total - grand_total;
+
+	$("#total_paid").val(total);
+	$("#diff").val(diff);
+
+	if(total != grand_total){
+		$(".btn-save").attr('disabled', true);
+	}else{
+		$(".btn-save").attr('disabled', false);
+	}
+});
+
+$(document).ready(function() {
+    var total_paid_1 = $("#total_paid_1").val().split(',').join('');
+	var total_paid_2 = $("#total_paid_2").val().split(',').join('');
+	var total_paid_3 = $("#total_paid_3").val().split(',').join('');
+	var grand_total  = $("#grand_total").val().split(',').join('');
+	var total        = 0;
+
+	total = Number(total_paid_1) + Number(total_paid_2) + Number(total_paid_3);
+	$("#total_paid").val(total);
+	$("#diff").val(diff);
+
+	if(total != grand_total){
+		$(".btn-save").attr('disabled', true);
+	}else{
+		$(".btn-save").attr('disabled', false);
+	}
+
+	if(total == 0){
+		$(".btn-save").attr('disabled', true);
+	}else{
+		$(".btn-save").attr('disabled', false);
+	}
+});
+
+window.INPUT.handleSelect2();
+window.INPUT.handleMaskCurrency();
+
+</script>

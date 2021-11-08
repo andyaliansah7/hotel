@@ -1,0 +1,258 @@
+{% extends 'adm/layout.html.twig' %}
+
+{% block content %}
+
+<div class="content-wrapper" id="vue-edit" style="background-color:white">
+
+	<form class="edit-form" method="POST" action="{{ site_url('adm/payments/save') }}">
+	
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h4>{{ content_title }}</h4>
+				</div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item">Beranda</li>
+						<li class="breadcrumb-item"><a href="#">Pembayaran</a></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+
+		<div class="container-fluid">
+
+		<div class="row ml-5 mr-5 mt-4">
+			<div class="col-md-5">
+			
+				<p class="h5 text-muted">Identitas Tamu</p>
+				<hr>
+				<input type="text" class="form-control" name="id" id="id" value="{{ id }}">
+
+				<div class="form-group">
+					<label>Nama Tamu</label>
+					<select class="form-control select2" id="guest" name="guest" tabindex="3" required="required">
+						<option value="register">- Registrasi Baru -</option>
+						{% if guest_data %}
+						{% for guest_row in guest_data %}
+						<option value="{{ guest_row.guest_id }}"
+							{% if same(guest_row.guest_id, check_array_key(header_data, 'guest_id')) %}
+							selected="selected" {% endif %}>{{ guest_row.guest_identity_number }} | {{ guest_row.guest_name }} ({{ guest_row.guest_phone }})</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<div class="col-md-6">
+							<address>
+								<strong>Kontak</strong><br>
+								<a href="mailto:#">exam.ple@example.com</a>
+								<br/>
+								<a href="mailto:#">+62 812 9109 515</a>
+							</address>
+						</div>
+						<div class="col-md-6">
+							<address>
+							Written by <a href="mailto:webmaster@example.com">Jon Doe</a>.<br>
+							Visit us at:<br>
+							Example.com<br>
+							Box 564, Disneyland<br>
+							USA
+							</address>
+						</div>
+					</div>
+				</div>
+
+				<p class="h5 mt-5 text-muted">Detail Pembayaran</p>
+				<hr>
+
+				<div class="row">
+				<div class="col-md-5">
+						<div class="form-group">
+							<label class="control-label">Metode</label>
+							<select class="form-control select2" name="payment_method_1" tabindex="17" required="required">
+								<option value="">- Pilih -</option>
+								{% if paymethod_data %}
+								{% for paymethod_row in paymethod_data %}
+								<option value="{{ paymethod_row.payment_method_id }}"
+									{% if same(paymethod_row.payment_method_id, check_array_key(header_data, 'payment_method_1')) %}
+									selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+								{% endfor %}
+								{% endif %}
+							</select>
+						</div>
+					</div>
+					<div class="col-md-7">
+						<div class="form-group">
+							<label class="control-label">Jumlah</label>
+							<input type="text" class="form-control currency-mask" id="total_paid_1" name="total_paid_1" tabindex="16" placeholder="0"
+									value="{{ to_decimal(check_array_key(header_data, 'total_paid_1')) }}" required="required">
+						</div>
+					</div>
+					
+				</div>
+
+				<div class="row">
+
+				<div class="col-md-5">
+						<div class="form-group">
+							<select class="form-control select2" name="payment_method_2" tabindex="19">
+								<option value="">- Pilih -</option>
+								{% if paymethod_data %}
+								{% for paymethod_row in paymethod_data %}
+								<option value="{{ paymethod_row.payment_method_id }}"
+									{% if same(paymethod_row.payment_method_id, check_array_key(header_data, 'payment_method_2')) %}
+									selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+								{% endfor %}
+								{% endif %}
+							</select>
+						</div>
+					</div>
+					<div class="col-md-7">
+						<div class="form-group">
+							<input type="text" class="form-control currency-mask" id="total_paid_2" name="total_paid_2" tabindex="18" placeholder="0"
+									value="{{ to_decimal(check_array_key(header_data, 'total_paid_2')) }}">
+						</div>
+					</div>
+					
+				</div>
+
+				<div class="row">
+				<div class="col-md-5">
+						<div class="form-group">
+							<select class="form-control select2" name="payment_method_3" tabindex="21">
+								<option value="">- Pilih -</option>
+								{% if paymethod_data %}
+								{% for paymethod_row in paymethod_data %}
+								<option value="{{ paymethod_row.payment_method_id }}"
+									{% if same(paymethod_row.payment_method_id, check_array_key(header_data, 'payment_method_3')) %}
+									selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+								{% endfor %}
+								{% endif %}
+							</select>
+						</div>
+					</div>
+					<div class="col-md-7">
+						<div class="form-group">
+							<input type="text" class="form-control currency-mask" id="total_paid_3" name="total_paid_3" tabindex="20" placeholder="0"
+									value="{{ to_decimal(check_array_key(header_data, 'total_paid_3')) }}">
+						</div>
+					</div>
+					
+				</div>
+
+				<button type="submit" class="btn btn-success float-right mb-5" style="width: 100%;">
+					SIMPAN
+				</button>
+			
+			</div>
+			<!-- /.col -->
+			<div class="col-md-6 ml-5">
+
+			<div class="card">
+              <div class="card-body">
+
+				
+				
+				<div class="row">
+					<div class="col-md-6">
+						<p class="h5 text-muted mb-5">Transaksi</p>
+					</div>
+					<div class="col-md-6">
+						<button type="button" class="btn btn-primary btn-xs float-right" @click="detailAdd">
+							<i class="fa fa-pencil"></i>edit
+						</button>
+					</div>
+				</div>
+
+                <ul class="list-group list-group-unbordered borderless" v-for="(row, detail_idx) in detailData">
+					<div class="info-box">
+              <span class="info-box-icon bg-info elevation-1"><i class="fas fa-cog"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">
+				
+					<small><strong><% row.number %></strong></small><br>
+					<small style="width:1%">lorem ipsum dolor sit ametim dasdjakljaskdj askj askdklsajdklas jkdsakdjlskajdlkajd lorem</small>
+				
+				
+				</span>
+				
+                <span class="info-box-number">
+                  
+				<span class="badge badge-success badge-pill">1,500,000</span>
+				  
+                </span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+                </ul>
+
+				
+
+              </div>
+              <!-- /.card-body -->
+
+            </div>
+			<!-- /.card -->
+
+			
+			  price
+				<input type="text" name="total_price" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly" 
+				v-bind:value="countTotalPrice()">
+				
+				discount
+				<input type="text" name="total_discount" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly" 
+				v-bind:value="countTotalDiscount()">
+
+				deposit
+				<input type="text" name="total_deposit" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly" 
+				v-bind:value="countTotalDeposit()">
+
+				total
+				<input type="text" name="total_amount" class="form-control text-right text-success text-bold currency-mask" style="background-color:white" readonly="readonly" 
+				v-bind:value="countTotalAmount()">
+			</div>
+			<!-- /.col -->
+		</div>
+		<!-- /.row -->
+
+		</div>
+		 	
+		</div>
+
+	</section>
+	<!-- /.content -->
+
+	</form>
+
+</div>
+
+<div class="modal fade edit-modal" id="modal-default">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content edit-modal-content">
+			Loading...
+		</div>
+	</div>
+</div>
+
+{% endblock  %}
+
+{% block add_javascript %}
+{{ parent() }}
+
+
+<script type="text/javascript" src="{{ assets_url('assets/js/app/payments/edit.js?') }}"></script>
+
+<script type="text/javascript">
+	window.FORM_EDIT.handleVue();
+	window.INPUT.handleSelect2();
+	window.INPUT.handleMaskCurrency();
+</script>
+{% endblock  %}

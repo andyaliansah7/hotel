@@ -1,0 +1,471 @@
+<style>
+body {
+    margin-top:40px;
+}
+.stepwizard-step p {
+    margin-top: 10px;
+}
+.stepwizard-row {
+    display: table-row;
+}
+.stepwizard {
+    display: table;
+    width: 100%;
+    position: relative;
+}
+.stepwizard-step button[disabled] {
+    opacity: 1 !important;
+    filter: alpha(opacity=100) !important;
+}
+.stepwizard-row:before {
+    top: 14px;
+    bottom: 0;
+    position: absolute;
+    content: " ";
+    width: 100%;
+    height: 1px;
+    background-color: #ccc;
+    z-order: 0;
+}
+.stepwizard-step {
+    display: table-cell;
+    text-align: center;
+    position: relative;
+}
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+}
+</style>
+
+<form class="master-form" action="{{ site_url('adm/checkin/save') }}" method="POST">
+
+	<div class="modal-header">
+		<h5 class="modal-title">{{ content_title }}</h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+
+	<div class="modal-body">
+	
+	<div class="stepwizard col-md-offset-3">
+		<div class="stepwizard-row setup-panel">
+			<div class="stepwizard-step">
+				<a href="#step-1" type="button" class="btn btn-primary btn-circle">1</a>
+				<p>Identitas Tamu</p>
+			</div>
+			<div class="stepwizard-step">
+				<a href="#step-2" type="button" class="btn btn-default btn-circle" disabled="disabled">2</a>
+				<p>Kamar & Biaya</p>
+			</div>
+			{# <div class="stepwizard-step">
+				<a href="#step-3" type="button" class="btn btn-default btn-circle" disabled="disabled">3</a>
+				<p>Biaya</p>
+			</div> #}
+		</div>
+  	</div>
+
+    <div class="row setup-content" id="step-1">
+		<div class="col-md-12">
+			<input class="form-control" name="id" id="id" value="{{ id }}" type="hidden">
+			<input class="form-control" name="book_id" id="book_id" value="{{ check_array_key(get_data, 'b_id') }}" type="hidden">
+			<input class="form-control" name="type" id="type" value="{{ check_array_key(get_data, 'transaction_type') }}" type="hidden">
+			<input class="form-control" name="interval" id="interval" value="{{ check_array_key(get_data, 'interval_stay') }}" type="hidden">
+			<input class="form-control" name="guest_group_discount" id="guest_group_discount" value="{{ check_array_key(get_data, 'guest_group_discount') }}" type="hidden">
+			<input class="form-control" name="room-id" id="room-id" value="{{ check_array_key(get_data, 'room_id') }}" type="hidden">
+
+			<div class="form-group">
+				<label class="control-label">Nomor Identitas</label>
+				<select class="form-control select2" id="identity_number" name="identity_number" tabindex="1" required="required">
+					<option value="register">- Registrasi Baru -</option>
+					{% if guest_data %}
+					{% for guest_row in guest_data %}
+					<option value="{{ guest_row.guest_id }}"
+						{% if same(guest_row.guest_id, check_array_key(get_data, 'guest_id')) %}
+						selected="selected" {% endif %}>{{ guest_row.guest_identity_number }} | {{ guest_row.guest_name }} ({{ guest_row.guest_phone }})</option>
+					{% endfor %}
+					{% endif %}
+				</select>
+
+				<input type="text" class="form-control mt-1" name="identity_number_new" id="identity_number_new" tabindex="1" placeholder="3200000089091234"
+					value="{{ check_array_key(get_data, 'guest_identity_number') }}" required="required">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Nama Tamu</label>
+				<input type="text" class="form-control" name="guest_name" id="guest_name" tabindex="2" placeholder="Mr. Aleen Smitham"
+					value="{{ check_array_key(get_data, 'guest_name') }}" required="required">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label" >Telepon</label>
+				<input type="text" class="form-control" name="guest_phone" id="guest_phone" tabindex="3" placeholder="0811 0000 2345"
+					value="{{ check_array_key(get_data, 'guest_phone') }}" required="required">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Alamat</label>
+				<textarea class="form-control" name="guest_address" id="guest_address" tabindex="4" placeholder="Weber Vista Gulgowskiburgh, DE 48529">{{ check_array_key(get_data, 'guest_address') }}</textarea>
+			</div>
+
+			<hr>
+
+			<div class="form-group">
+				<label class="control-label">Grup Tamu</label>
+				<select class="form-control select2" id="guest_group" name="guest_group" tabindex="5" required="required">
+					<option value="">- Pilih -</option>
+					{% if guest_group_data %}
+					{% for guest_group_row in guest_group_data %}
+					<option value="{{ guest_group_row.guest_group_id }}"
+						{% if same(guest_group_row.guest_group_id, check_array_key(get_data, 'guest_group_id')) %}
+						selected="selected" {% endif %}>{{ guest_group_row.guest_group_name }} (Diskon {{ to_decimal(guest_group_row.guest_group_discount) }} %)</option>
+					{% endfor %}
+					{% endif %}
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Atas Nama</label>
+				<select class="form-control select2" id="on_behalf" name="on_behalf" tabindex="5" required="required">
+					<option value="default">- Default -</option>
+					{% if guest_data %}
+					{% for guest_row in guest_data %}
+					<option value="{{ guest_row.guest_id }}"
+						{% if same(guest_row.guest_id, check_array_key(get_data, 'on_behalf')) %}
+						selected="selected" {% endif %}>{{ guest_row.guest_identity_number }} | {{ guest_row.guest_name }} ({{ guest_row.guest_phone }})</option>
+					{% endfor %}
+					{% endif %}
+				</select>
+			</div>
+
+			<button class="btn btn-primary nextBtn float-right" type="button">Selanjutnya</button>
+		</div>
+    </div>
+
+	<div class="row setup-content" id="step-2">
+		<div class="col-md-12">
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-group">
+						<label class="control-label">Tanggal Masuk</label>
+						<input type="date" class="form-control" id="date_in" name="date_in" value="{{ check_array_key(get_data, 'date_in') }}" tabindex="6">
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-group">
+						<label class="control-label">Tanggal Keluar</label>
+						<input type="date" class="form-control" id="date_out" name="date_out" value="{{ check_array_key(get_data, 'date_out') }}" tabindex="7">
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Tipe Kamar</label>
+				<select class="form-control select2" id="room_type" name="room_type" tabindex="8" required="required">
+					<option value="">- Pilih -</option>
+					{% if room_type_data %}
+					{% for room_type_row in room_type_data %}
+					<option value="{{ room_type_row.room_type_id }}"
+						{% if same(room_type_row.room_type_id, check_array_key(get_data, 'room_type_id')) %}
+						selected="selected" {% endif %}>{{ room_type_row.room_type_name }}</option>
+					{% endfor %}
+					{% endif %}
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Nomor Kamar</label>
+				<select class="form-control select2" id="room" name="room" tabindex="9" required="required">
+					<option value="">- Pilih -</option>
+				</select>
+			</div>
+
+			<hr>
+
+			<div class="form-group">
+				<label class="control-label">Harga</label>
+				<input type="text" class="form-control currency-mask text-left" name="room_price" id="room_price" tabindex="10" placeholder="0"
+						value="{{ to_decimal(check_array_key(get_data, 'room_price')) }}" required="required">
+				<div class="input-group mt-1">
+				<input type="text" class="form-control currency-mask text-left" name="total_price" id="total_price" placeholder="0" value="{{ to_decimal(check_array_key(get_data, 'total_price')) }}" readonly="readonly">
+				<div class="input-group-append">
+					<span class="input-group-text" id="day-addon2">{{ check_array_key(get_data, 'interval_stay') }} malam</span>
+				</div>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Diskon</label>
+				<input type="text" class="form-control currency-mask text-left" name="discount" id="discount" tabindex="11" placeholder="0"
+						value="{{ to_decimal(check_array_key(get_data, 'discount')) }}">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Total</label>
+				<input type="text" class="form-control currency-mask text-left" name="total" id="total" tabindex="12" placeholder="0"
+						value="{{ to_decimal(check_array_key(get_data, 'total')) }}" required="required" readonly="readonly">
+
+				<input type="hidden" class="form-control currency-mask text-left" name="weekday_price" id="weekday_price" tabindex="12" placeholder="0"
+						value="{{ to_decimal(check_array_key(get_data, 'total')) }}" required="required" readonly="readonly">
+				<input type="hidden" class="form-control currency-mask text-left" name="weekend_price" id="weekend_price" tabindex="12" placeholder="0"
+						value="{{ to_decimal(check_array_key(get_data, 'total')) }}" required="required" readonly="readonly">
+			</div>
+
+			<div class="form-group">
+				<label class="control-label">Deposit</label>
+				<input type="text" class="form-control currency-mask text-left" name="deposit" id="deposit" tabindex="13" placeholder="0"
+						value="{{ to_decimal(check_array_key(get_data, 'deposit')) }}">
+			</div>
+
+			<hr>
+
+			<div class="form-group">
+				<label class="control-label">Shift</label>
+				<select class="form-control select2" name="shift" tabindex="14" required="required">
+					<option value="">- Pilih -</option>
+					{% if shift_data %}
+					{% for shift_row in shift_data %}
+					<option value="{{ shift_row.shift_id }}"
+						{% if same(shift_row.shift_id, check_array_key(get_data, 'shift_id')) %}
+						selected="selected" {% endif %}>{{ shift_row.shift_name }} ({{ shift_row.shift_time }})</option>
+					{% endfor %}
+					{% endif %}
+				</select>
+			</div>
+
+			<button class="btn btn-default prevBtn float-left" type="button">Sebelumnya</button>
+
+			<div class="btn-group float-right">
+				<button type="button" class="btn btn-warning waves-effect master-cancel" data-dismiss="modal">Batal</button>
+				<button class="btn btn-success btn-save float-right" name="action" value="save_close" type="submit">
+					Simpan
+				</button>
+			</div>
+			
+		</div>
+	</div>
+	
+	</div>
+
+</form>
+
+<script type="text/javascript">
+
+$(document).ready(function () {
+	var navListItems = $('div.setup-panel div a'),
+			allWells = $('.setup-content'),
+			allNextBtn = $('.nextBtn'),
+			allPrevBtn = $('.prevBtn');
+
+	allWells.hide();
+
+	navListItems.click(function (e) {
+		e.preventDefault();
+		var $target = $($(this).attr('href')),
+				$item = $(this);
+
+		if (!$(this).hasClass('disabled')) {
+			
+			navListItems.removeClass('btn-primary').addClass('btn-default');
+			$item.removeClass('btn-default');
+			$item.addClass('btn-primary');
+
+			
+			allWells.hide();
+			$target.show();
+			$target.find('input:eq(0)').focus();
+		}
+	});
+	
+	allPrevBtn.click(function(){
+		var curStep = $(this).closest(".setup-content"),
+			curStepBtn = curStep.attr("id"),
+			prevStepWizard = $('div.setup-panel div a[href="#' + curStepBtn + '"]').parent().prev().children("a");
+
+			prevStepWizard.removeAttr('disabled').trigger('click');
+	});
+
+	allNextBtn.click(function(){
+		var curStep = $(this).closest(".setup-content"),
+			curStepBtn = curStep.attr("id"),
+			nextStepWizard = $('div.setup-panel div a[href="#' + curStepBtn + '"]').parent().next().children("a"),
+			curInputs = curStep.find("input[type='text'],input[type='url']"),
+			isValid = true;
+
+		{# $(".form-group").removeClass("was-validated");
+		for(var i=0; i<curInputs.length; i++){
+			if (!curInputs[i].validity.valid){
+				isValid = false;
+				$(curInputs[i]).closest(".form-group").addClass("was-validated");
+			}
+		} #}
+
+		if (isValid)
+			nextStepWizard.removeAttr('disabled').trigger('click');
+	});
+
+	$('div.setup-panel div a.btn-primary').trigger('click');
+});
+
+var UrlIdentity   = "{{ site_url('adm/checkin/check_identity_number') }}";
+var UrlRoom       = "{{ site_url('adm/checkin/check_room_available') }}";
+var UrlGuestGroup = "{{ site_url('adm/checkin/guest_group_data') }}";
+
+var elSelectID = "#identity_number";
+var elTextID1 = "#guest_name";
+var elTextID2 = "#guest_phone";
+var elTextID3 = "#guest_address";
+var elTextID4 = "#on_behalf";
+var elAddIdentity = "#identity_number_new";
+var elTextID1Label = "#guest_name_text";
+var elTextID2Label = "#guest_phone_text";
+
+var elSelectID1 = "#room_type";
+var elSelectID2 = "#room";
+var elAdditionalID1 = "#date_in";
+var elAdditionalID2 = "#date_out";
+var elAdditionalID3 = "#room_price";
+var elAdditionalID4 = "#total_price";
+var elAdditionalID5 = "#interval";
+var elAdditionalID6 = "#total";
+var error_messsage = "Format tanggal tidak valid";
+
+var data_id = $("#id").val();
+var data_book_id = $("#book_id").val();
+
+{# if(data_id != 'new'){
+	$(elAddIdentity).attr('hidden', true);
+	$(elTextID1).attr('readonly', true);
+	$(elTextID2).attr('readonly', true);
+	$(elTextID3).attr('readonly', true);
+} #}
+
+$('#date_in').change(function() {
+	var append = '<option value="">- Pilih -</option>';
+
+	$("#room_type").val("").change();
+	$('#room').find('option').remove().end().append(append);
+	$(elAdditionalID3).val('');
+	$(elAdditionalID4).val('');
+	$(elAdditionalID5).val('');
+	$(elAdditionalID6).val('');
+});
+
+$('#date_out').change(function() {
+	var append = '<option value="">- Pilih -</option>';
+
+	$("#room_type").val("").change();
+	$('#room').find('option').remove().end().append(append);
+	$(elAdditionalID3).val('');
+	$(elAdditionalID4).val('');
+	$(elAdditionalID5).val('');
+	$(elAdditionalID6).val('');
+});
+
+$('#room_price').keyup(function(e) {
+	var room_price  = $(e.target).val().split(',').join('');
+	var interval    = $("#interval").val().split(',').join('');
+	var guest_group_discount = $("#guest_group_discount").val();
+	var discount    = $("#discount").val().split(',').join('');
+
+	var price_total_a = 0;
+	var price_total_b = 0;
+	var total_price   = 0;
+	var total         = 0;
+
+	total_price = (room_price * interval);
+	
+	price_total_a = (total_price * (guest_group_discount/100));
+	price_total_b = (total_price - price_total_a);
+
+	total = price_total_b - discount;
+
+	$("#total_price").val(total_price);
+	$("#total").val(total);
+});
+
+$('#discount').keyup(function(e) {
+	var discount    = $(e.target).val().split(',').join('');
+	var guest_group_discount = $("#guest_group_discount").val();
+	var total_price = $("#total_price").val().split(',').join('');
+	var total       = 0;
+
+	price_total_a = (total_price * (guest_group_discount/100));
+	price_total_b = (total_price - price_total_a);
+
+	total = price_total_b - discount;
+
+	$("#total").val(total);
+});
+
+var room_id = $('#room-id').val();
+
+if(data_id != 'new'){
+
+	$.ajax({
+		type : "POST",
+		url : UrlRoom,
+		dataType : "JSON",
+		data : {
+			room_type_id: $('#room_type').val(),
+			date_in     : $('#date_in').val(),
+			date_out    : $('#date_out').val(),
+			id          : data_id,
+			b_id        : data_book_id,
+		},
+		success: function(data){
+			$("#room").html("<option value=''>- Pilih -</option>");
+			$.each(data['room_available'], function(i, d) {
+				if (room_id===d.room_id) {
+					$('#room').append('<option value="' + d.room_id + '" selected="selected">' + d.room_number + '</option>');
+				}else{
+					$('#room').append('<option value="' + d.room_id + '">' + d.room_number + '</option>');
+				}
+			});
+		}
+	});
+}
+
+$("#guest_group").change(function (e) {
+	var id = $(e.target).val();
+	
+	$.ajax({
+		type: "POST",
+		url: UrlGuestGroup,
+		dataType: "JSON",
+		data: {
+			id: id
+		},
+		success: function (guest_group_discount) {
+
+			$("#guest_group_discount").val(guest_group_discount);
+
+			var discount    = $("#discount").val().split(',').join('');
+			var total_price = $("#total_price").val().split(',').join('');
+			var total       = 0;
+
+			price_total_a = (total_price * (guest_group_discount/100));
+			price_total_b = (total_price - price_total_a);
+
+			total = price_total_b - discount;
+
+			$("#total").val(total);
+			
+		},
+	});			
+});
+
+
+window.FORM.handleCheckFieldIdentityNumber(UrlIdentity, elSelectID, elTextID1, elTextID2, elTextID3, elTextID4, elAddIdentity, elTextID1Label, elTextID2Label);
+window.FORM.handleNestedSelectCheckin(UrlRoom, elSelectID1, elSelectID2, elAdditionalID1, elAdditionalID2, elAdditionalID3, elAdditionalID4, elAdditionalID5, elAdditionalID6, error_messsage);
+window.INPUT.handleSelect2();
+{# window.INPUT.handleSelect2AddNew(); #}
+window.INPUT.handleMaskCurrency();
+
+</script>

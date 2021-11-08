@@ -1,0 +1,77 @@
+<div id="embed-vue">
+
+	<div class="modal-header">
+		<h5 class="modal-title">{{ content_title }}</h5>
+
+		<button type="button" class="close embed-close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+
+
+	<div class="modal-body">
+
+		<div class="embed-vue">
+
+			<input type="text" class="form-control float-right" style="width:100%; margin: 0 0 1% 0;" id="search" @keyup="getDataEmbed($event.target.value)" placeholder="Pencarian...">
+
+			<div class="card-body table-responsive p-0" style="max-height: 400px;">
+				<ul class="list-group shadow">
+						<li class="list-group-item" v-for="(row, idx) in listData">
+							<div class="media align-items-lg-center flex-column flex-lg-row p-3">
+								<div class="media-body order-2 order-lg-1">
+									
+									<div class="d-flex align-items-center justify-content-between mt-0">
+										<h5 class="mt-0 font-weight-bold mb-2"><% row.number %></h5>
+										<button class="btn btn-xs" v-bind:class="row.btncolor" style="width: 25px; height: 25px;" @click="getSelectedData(row, idx)">
+											<i v-bind:class="row.btnicon"></i>
+										</button>
+									</div>
+									<p class="font-italic text-muted mb-0 mr-5 small" v-if="row.type == 'T'">
+										<% row.guest_name %> <% row.guest_telp %> <br>
+										<% row.date_range %><br>
+										<% row.room %>
+										(<% row.room_type %>)<br>
+										<% row.guest_group %>
+										{# <% row.paid %> #}
+									</p>
+									<p class="font-italic text-muted mb-0 mr-5 small" v-if="row.type == 'C'">
+										<% row.guest_name %> <% row.guest_telp %><br>
+										<% row.room %>
+										<% row.room_type %>
+										<ul class="font-italic text-muted mb-0 mr-5 small">
+											<li v-for="(row_d, idx_d) in row.detail_cs"><% row_d.cs_detail_quantity %> <% row_d.cs_name %> (<% formatPrice(row_d.cs_detail_total) %>)</li>
+										</ul>
+									</p>
+									<div class="d-flex align-items-center justify-content-between mt-1">
+										<h6 class="font-weight-bold my-2">Rp. <% row.total %></h6>
+										<span class="badge badge-pill" v-bind:class="row.typecolor"><% row.typeicon %></span>
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+
+			</div>
+
+		</div>
+
+	</div>
+
+	<div class="modal-footer">
+			<!-- <button class="btn btn-success btn-sm" @click="getSelectedData()">
+				<i class="fa fa-check"></i> &nbsp; Selesai
+			</button> -->
+			<button class="btn btn-success" style="width: 25%;" @click="closeModal()">
+				Selesai
+			</button>
+	</div>
+
+</div>
+
+<script type="text/javascript" src="{{ assets_url('assets/js/app/payments/embed.js') }}"></script>
+<script type="text/javascript">
+
+	window.EMBED.init();
+
+</script>

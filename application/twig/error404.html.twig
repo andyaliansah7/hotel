@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>{{ content_title }}</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+  {% block add_css %}
+  <style>
+    /* Container needed to position the button. Adjust the width as needed */
+    .container {
+    position: relative;
+    width: 100%;
+    }
+
+    /* Make the image responsive */
+    .container img {
+    width: 100%;
+    height: auto;
+    }
+
+    /* Style the button and place it in the middle of the container/image */
+    .container .btn {
+    position: absolute;
+    top: 62%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    color: #0089B3;
+    font-size: 22px;
+    padding: 12px 24px;
+    font-family: Arial, Helvetica, sans-serif;
+    }
+
+  </style>
+  {% endblock %}
+
+  <body>
+
+    <div class="container">
+    	<!-- <img src="{{ base_url('assets/images/bg/errorpage.jpg') }}" style="background-size: cover; width: 100%;"> -->
+      <H1>404 Page Not Found</H1>
+    	<a class="btn btn-default" style="padding-top:50%" href="{{ site_url('adm/dashboard') }}">
+    		<i class="fa fa-window-close"></i> Back to Dashboard
+    	</a>
+    </div>
+
+  </body>
+  {% block add_javascript %}
+    
+  {% endblock %}
+
+  </body>
+  </html>
+

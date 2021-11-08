@@ -1,0 +1,98 @@
+<form class="master-form" action="{{ site_url('adm/deposit/save') }}" method="POST">
+
+	<div class="modal-header">
+		<h5 class="modal-title">{{ content_title }}</h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+
+	<div class="modal-body">
+		<input class="form-control" name="id" value="{{ id }}" type="hidden">
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Tanggal</label>
+					<input type="date" class="form-control" name="date" tabindex="1" value="{{ check_array_key(get_data, 'deposit_date') }}" required="required">
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Nama Tamu</label>
+					<select class="form-control select2" id="guest" name="guest" tabindex="2" required="required">
+						<option value="">- Pilih -</option>
+						{% if guest_data %}
+						{% for guest_row in guest_data %}
+						<option value="{{ guest_row.guest_id }}"
+							{% if same(guest_row.guest_id, check_array_key(get_data, 'guest_id')) %}
+							selected="selected" {% endif %}>{{ guest_row.guest_identity_number }} | {{ guest_row.guest_name }} ({{ guest_row.guest_phone }})</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Jumlah</label>
+					<input type="text" class="form-control currency-mask text-left" name="amount" tabindex="3" placeholder="499,990"
+						value="{{ amount }}" required="required">
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+				<label class="control-label">Metode Pembayaran</label>
+					<select class="form-control select2" name="payment_method" tabindex="4" required="required">
+						<option value="">- Pilih -</option>
+						{% if paymethod_data %}
+						{% for paymethod_row in paymethod_data %}
+						<option value="{{ paymethod_row.payment_method_id }}"
+							{% if same(paymethod_row.payment_method_id, check_array_key(header_data, 'payment_method_id')) %}
+							selected="selected" {% endif %}>{{ paymethod_row.payment_method_name }}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+				<label class="control-label">Keterangan</label>
+					<textarea class="form-control" name="description" tabindex="5">{{ check_array_key(get_data, 'deposit_description') }}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default waves-effect master-cancel" data-dismiss="modal">Batal</button>
+
+		<div class="btn-group" role="group">
+	        <button name="action" value="save" class="btn btn-primary btn-save" type="submit">
+	        	Simpan
+	        </button>
+	        <button type="button" class="btn btn-primary btn-save dropdown-toggle" data-toggle="dropdown"
+	        	aria-haspopup="true" aria-expanded="false">
+	        </button>
+			<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+				<!-- <a class="dropdown-item" href="#">Dropdown link</a> -->
+				<button class="dropdown-item" name="action" value="save_new" type="submit" href="#">Simpan &amp; Baru</button>
+				<button class="dropdown-item" name="action" value="save_close" type="submit" href="#">Simpan &amp; Tutup</button>
+			</div>
+		</div>
+	</div>
+
+</form>
+
+<script type="text/javascript">
+
+	var elDivID = "#namecheck";
+	var elResult = ".result_check";
+	var elUrl = "{{ site_url('adm/special_rates/check_id') }}";
+	var elBtn = ".btn-save";
+
+	{# window.FORM.handleCheckField2(elDivID, elResult, elUrl, elBtn, "", ""); #}
+	window.INPUT.handleSelect2();
+	window.INPUT.handleMaskCurrency();
+
+</script>

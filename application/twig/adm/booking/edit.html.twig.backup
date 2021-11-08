@@ -1,0 +1,274 @@
+<form class="master-form" action="{{ site_url('adm/booking/save') }}" method="POST">
+
+	<div class="modal-header">
+		<h5 class="modal-title">{{ content_title }}</h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+
+	<div class="modal-body">
+		<input class="form-control" name="id" value="{{ id }}" type="hidden">
+		<input class="form-control" name="room-id" id="room-id" value="{{ check_array_key(get_data, 'room_id') }}" type="hidden">
+
+		<div class="row">
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Nomor Identitas</label>
+					<select class="form-control select2addnew" id="identity_number" name="identity_number" tabindex="1" required="required">
+						<option value="">- Pilih -</option>
+						{% if guest_data %}
+						{% for guest_row in guest_data %}
+						<option value="{{ guest_row.guest_id }}"
+							{% if same(guest_row.guest_id, check_array_key(get_data, 'guest_id')) %}
+							selected="selected" {% endif %}>{{ guest_row.guest_identity_number }}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Nama Tamu</label>
+					<input type="text" class="form-control" name="guest_name" id="guest_name" tabindex="2" placeholder="Mr. Aleen Smitham"
+						value="{{ check_array_key(get_data, 'guest_name') }}" required="required">
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Telepon</label>
+					<input type="text" class="form-control" name="guest_phone" id="guest_phone" tabindex="3" placeholder="0811 0000 2345"
+						value="{{ check_array_key(get_data, 'guest_phone') }}" required="required">
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Alamat</label>
+					<input type="text" class="form-control" name="guest_address" id="guest_address" tabindex="4" placeholder="Weber Vista Gulgowskiburgh, DE 48529"
+						value="{{ check_array_key(get_data, 'guest_address') }}" required="required">
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Grup Tamu</label>
+					<select class="form-control select2" id="guest_group" name="guest_group" tabindex="5" required="required">
+						<option value="">- Pilih -</option>
+						{% if guest_group_data %}
+						{% for guest_group_row in guest_group_data %}
+						<option value="{{ guest_group_row.guest_group_id }}"
+							{% if same(guest_group_row.guest_group_id, check_array_key(get_data, 'guest_group_id')) %}
+							selected="selected" {% endif %}>{{ guest_group_row.guest_group_name }} (Diskon {{ to_decimal(guest_group_row.guest_group_discount) }} %)</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="form-group">
+							<label class="control-label">Tanggal Masuk</label>
+							<input type="date" class="form-control" id="date_in" name="date_in" value="{{ check_array_key(get_data, 'date_in') }}" tabindex="6">
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							<label class="control-label">Tanggal Keluar</label>
+							<input type="date" class="form-control" id="date_out" name="date_out" value="{{ check_array_key(get_data, 'date_out') }}" tabindex="7">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Tipe Kamar</label>
+					<select class="form-control select2" id="room_type" name="room_type" tabindex="8" required="required">
+						<option value="">- Pilih -</option>
+						{% if room_type_data %}
+						{% for room_type_row in room_type_data %}
+						<option value="{{ room_type_row.room_type_id }}"
+							{% if same(room_type_row.room_type_id, check_array_key(get_data, 'room_type_id')) %}
+							selected="selected" {% endif %}>{{ room_type_row.room_type_name }}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="control-label">Nomor Kamar</label>
+					<select class="form-control select2" id="room" name="room" tabindex="9" required="required">
+						<option value="">- Pilih -</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+				<label class="control-label">Harga</label>
+				<input type="text" class="form-control currency-mask text-left" name="room_price" id="room_price" tabindex="10" placeholder="850,000"
+						value="{{ to_decimal(check_array_key(get_data, 'room_price')) }}" required="required">
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+				<label class="control-label">Diskon</label>
+				<input type="text" class="form-control" name="discount" id="discount" tabindex="11" placeholder="5.00"
+						value="{{ to_decimal(check_array_key(get_data, 'discount')) }}">
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+				<label class="control-label">Total</label>
+				<input type="text" class="form-control currency-mask text-left" name="total" id="total" tabindex="12" placeholder="807,500"
+						value="{{ to_decimal(check_array_key(get_data, 'total')) }}" required="required" readonly="readonly">
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+				<label class="control-label">Deposito</label>
+				<input type="text" class="form-control currency-mask text-left" name="deposit" id="deposit" tabindex="13" placeholder="100,000"
+						value="{{ to_decimal(check_array_key(get_data, 'deposit')) }}" required="required">
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+				<label class="control-label">Atas Nama</label>
+				<input type="text" class="form-control" name="on_behalf" id="on_behalf" tabindex="14" placeholder="Emanuel Buckridge"
+						value="{{ check_array_key(get_data, 'on_behalf') }}" required="required">
+				</div>
+			</div>
+			
+		</div>
+	</div>
+
+
+	<div class="modal-footer">
+		<button type="button" class="btn btn-default waves-effect master-cancel" data-dismiss="modal">Batal</button>
+
+		<div class="btn-group" role="group">
+	        <button name="action" value="save_close" class="btn btn-primary btn-save" type="submit">
+	        	Simpan
+	        </button>
+	        <button type="button" class="btn btn-primary btn-save dropdown-toggle" data-toggle="dropdown"
+	        	aria-haspopup="true" aria-expanded="false">
+	        </button>
+			<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+				<!-- <a class="dropdown-item" href="#">Dropdown link</a> -->
+				<button class="dropdown-item" name="action" value="save_new" type="submit" href="#">Simpan &amp; Baru</button>
+				<button class="dropdown-item" name="action" value="save_close" type="submit" href="#">Simpan &amp; Tutup</button>
+			</div>
+		</div>
+	</div>
+
+</form>
+
+<script type="text/javascript">
+
+	var UrlIdentity = "{{ site_url('adm/booking/check_identity_number') }}";
+	var UrlRoom     = "{{ site_url('adm/booking/check_room_available') }}";
+
+	var elSelectID = "#identity_number";
+	var elTextID1 = "#guest_name";
+	var elTextID2 = "#guest_phone";
+	var elTextID3 = "#guest_address";
+	var elTextID4 = "#on_behalf";
+
+	var elSelectID1 = "#room_type";
+	var elSelectID2 = "#room";
+	var elAdditionalID1 = "#date_in";
+	var elAdditionalID2 = "#date_out";
+	var elAdditionalID3 = "#room_price";
+	var elAdditionalID4 = "#total";
+	var error_messsage = "Format tanggal tidak valid";
+
+	$('#date_in').change(function() {
+		var append = '<option value="">- Pilih -</option>';
+
+		$("#room_type").val("").change();
+		$('#room').find('option').remove().end().append(append);
+		$(elAdditionalID3).val('');
+		$(elAdditionalID4).val('');
+	});
+
+	$('#date_out').change(function() {
+		var append = '<option value="">- Pilih -</option>';
+
+		$("#room_type").val("").change();
+		$('#room').find('option').remove().end().append(append);
+		$(elAdditionalID3).val('');
+		$(elAdditionalID4).val('');
+	});
+
+	$('#room_price').keyup(function(e) {
+		var room_price = $(e.target).val().split(',').join('');
+		var discount   = $("#discount").val().split(',').join('');
+		var result = 0;
+		var total = 0;
+
+		result = room_price * (discount/100);
+		total = room_price - result;
+
+		$("#total").val(total);
+	});
+
+	$('#discount').keyup(function(e) {
+		var discount = $(e.target).val().split(',').join('');
+		var room_price   = $("#room_price").val().split(',').join('');
+		var result = 0;
+		var total = 0;
+
+		result = room_price * (discount/100);
+		total = room_price - result;
+
+		$("#total").val(total);
+	});
+
+	var room_id = $('#room-id').val();
+
+	if($('#id').val() != 'new'){
+		
+		$(elTextID1).attr('disabled', true);
+		$(elTextID2).attr('disabled', true);
+		$(elTextID3).attr('disabled', true);
+
+		$.ajax({
+			type : "POST",
+			url : UrlRoom,
+			dataType : "JSON",
+			data : {
+				id : $('#room_type').val(),
+			},
+			success: function(data){
+				$("#room").html("<option value=''>- Pilih -</option>");
+				$.each(data, function(i, d) {
+					if (room_id===d.room_id) {
+						$('#room').append('<option value="' + d.room_id + '" selected="selected">' + d.room_number + '</option>');
+					}else{
+						$('#room').append('<option value="' + d.room_id + '">' + d.room_number + '</option>');
+					}
+				});
+			}
+      	});
+	}
+    
+	
+	window.FORM.handleCheckFieldIdentityNumber(UrlIdentity, elSelectID, elTextID1, elTextID2, elTextID3, elTextID4);
+	window.FORM.handleNestedSelect(UrlRoom, elSelectID1, elSelectID2, elAdditionalID1, elAdditionalID2, elAdditionalID3, elAdditionalID4, error_messsage);
+	window.INPUT.handleSelect2();
+	window.INPUT.handleSelect2AddNew();
+	window.INPUT.handleMaskCurrency();
+
+</script>

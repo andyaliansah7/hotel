@@ -1,0 +1,272 @@
+<?php
+/**
+ * Payment Controller
+ * @author Andy Aliansah <andyaliansah97@gmail.com>
+ */
+use libraries\BaseController;
+
+class Payments extends BaseController {
+
+	/**
+	 * Constructor CodeIgniter
+	 */
+	public function __construct() {
+		parent::__construct();
+		$this->auth->check_auth();
+
+		// load model
+		$this->load->model('Checkin_model');
+		$this->load->model('Consumption_services_model');
+		$this->load->model('Payment_methods_model');
+		$this->load->model('Payments_model');
+	}
+	
+	public function index() {
+		$data['content_title'] = 'Pembayaran ';
+
+		if(check_roles('1')){
+			$this->twiggy_display('adm/payments/index', $data);
+		}else{
+			redirect("Error");
+		}
+	}
+
+	public function get_data() {
+		$data = [];
+		$get_data = $this->Payments_model->get_data()->result();
+
+		if($get_data) {
+			$no=1;
+			foreach($get_data as $get_row) {
+				
+				$data[] = array(
+					'no'                => $no,
+					'id'                => $get_row->id,
+					'payment_date'      => indonesian_date($get_row->payment_date),
+					'payment_number'    => $get_row->payment_number,
+					'checkin_number'    => $get_row->transaction_number,
+					'guest_name'        => $get_row->guest_name,
+					'room_type'         => $get_row->room_type_name,
+					'room'              => $get_row->room_number,
+					'date_in'           => indonesian_date($get_row->date_in),
+					'date_out'          => indonesian_date($get_row->date_out),
+					'total_room'        => "Rp. " .number_format($get_row->total_room_price),
+					'discount'          => "Rp. " .number_format($get_row->discount),
+					'deposit'           => "Rp. " .number_format($get_row->deposit),
+					'total_consumption' => "Rp. " .number_format($get_row->total_consumption_price),
+					'total_service'     => "Rp. " .number_format($get_row->total_service_price),
+					'tax'               => "Rp. " .number_format($get_row->tax),
+					'total'             => "Rp. " .number_format($get_row->total),
+					'total_paid_1'      => "Rp. " .number_format($get_row->total_paid_1),
+					'total_paid_2'      => "Rp. " .number_format($get_row->total_paid_2),
+					'total_paid_3'      => "Rp. " .number_format($get_row->total_paid_3),
+					'payment_method_1'  => $get_row->p1_name,
+					'payment_method_2'  => $get_row->p2_name,
+					'payment_method_3'  => $get_row->p3_name
+				);
+			$no++;
+			}
+
+		}
+
+		$response = [ 
+			'data'         => $data,
+			'recordsTotal' => count($data)
+		];
+
+		output_json($response);
+	}
+
+	public function edit($id='new') {
+		$title     = "Tambah";
+		$get_data  = array();
+		$where_trx = array('transaction_type' => 'C', 'status <>' => '2');
+
+		if($id != 'new') {
+			$title    = "Edit";
+			$where    = array('a.id' => $id);
+			$get_data = $this->Payments_model->get_data($where)->row_array();
+			$where_trx = "transaction_type='C' AND (status!='2' OR id='".check_array_key($get_data, 'transaction_id')."')";
+		}
+
+		$data['id']               = $id;
+		$data['content_title']    = $title;
+		$data['get_data']         = $get_data;
+
+		$data['transaction_data'] = $this->Checkin_model->get_data($where_trx)->result();
+		$data['paymethod_data']   = $this->Payment_methods_model->get_data()->result();
+
+		$this->twiggy_display('adm/payments/edit', $data);
+	}
+
+	public function save() {
+		// post
+		$id                      = $this->input->post('id');
+		$transaction             = $this->input->post('transaction_id');
+		$transaction_old         = $this->input->post('transaction_old_id');
+		$total_room_price        = $this->input->post('total_room_price');
+		$discount                = $this->input->post('discount');
+		$deposit                 = $this->input->post('deposit');
+		$total_consumption_price = $this->input->post('total_consumption_price');
+		$total_service_price     = $this->input->post('total_service_price');
+		$tax                     = $this->input->post('tax');
+		$grand_total             = $this->input->post('grand_total');
+		$total_paid_1            = $this->input->post('total_paid_1');
+		$total_paid_2            = $this->input->post('total_paid_2');
+		$total_paid_3            = $this->input->post('total_paid_3');
+		$payment_method_1        = $this->input->post('payment_method_1');
+		$payment_method_2        = $this->input->post('payment_method_2');
+		$payment_method_3        = $this->input->post('payment_method_3');
+
+		$prefix           = "INV";
+		$datenow          = date("mY");
+		$number_generator = $this->Payments_model->payment_autonumber();
+		$autonumber       = $prefix.$datenow.$number_generator;
+
+		$action = $this->input->post('action');
+
+		$data_save = array(
+			'transaction_id'          => $transaction,
+			'payment_number'          => $autonumber,
+			'payment_date'            => date_now(),
+			'total_room_price'        => trims($total_room_price),
+			'discount'                => trims($discount),
+			'deposit'                 => trims($deposit),
+			'total_consumption_price' => trims($total_consumption_price),
+			'total_service_price'     => trims($total_service_price),
+			// 'tax'                     => trims($tax),
+			'tax'                     => 0,
+			'grand_total'             => trims($grand_total),
+			'total_paid_1'            => trims($total_paid_1),
+			'total_paid_2'            => trims($total_paid_2),
+			'total_paid_3'            => trims($total_paid_3),
+			'payment_method_1'        => trims($payment_method_1),
+			'payment_method_2'        => trims($payment_method_2),
+			'payment_method_3'        => trims($payment_method_3),
+		);
+		date_default_timezone_set('Asia/Jakarta');
+		$checkout_date = date('Y-m-d H:i:s');
+
+		if($id == 'new') {
+			
+			$data_status = array(
+				'status' => '2',
+				'checkout_date' => $checkout_date
+			);
+			
+			$update_status = $this->Checkin_model->update($transaction, $data_status);
+
+			if($update_status){
+				$convert = convert_button($action, $id);
+				$save = $this->Payments_model->save($data_save);
+			}
+			
+		} else {
+
+			$update_status_old = false;
+			if($transaction != $transaction_old){
+				$data_status_old = array(
+					'status' => '1',
+					'checkout_date' => NULL
+				);
+				
+				$update_status_old = $this->Checkin_model->update($transaction_old, $data_status_old);
+			}else{
+				$update_status_old = true;
+			}
+
+			if($update_status_old){
+				$data_status = array(
+					'status' => '2',
+					'checkout_date' => $checkout_date
+				);
+				
+				$update_status = $this->Checkin_model->update($transaction, $data_status);
+	
+				if($update_status){
+					$convert = convert_button($action, $id);
+					$save = $this->Payments_model->update($id, $data_save);
+				}
+			}
+		}
+
+		if($save) {
+			$response = array(
+				'status'  => 'success',
+				'message' => 'Berhasil menyimpan data',
+				'id'      => $convert
+			);
+		}
+
+		else {
+			$response = array(
+				'status'  => 'error',
+				'message' => 'Gagal menyimpan data',
+				'id'      => $convert
+			);
+		}
+
+		output_json($response);
+	}
+
+	public function delete() {
+		$id = $this->input->post('id');
+		
+
+		$data_status = array(
+			'status' => '1',
+			'checkout_date' => NULL
+		);
+
+		foreach($id as $row) {
+
+			$get_id        = $this->Payments_model->get_data(array('a.id' => $row))->row()->transaction_id;
+			$update_status = $this->Checkin_model->update($get_id, $data_status);
+
+			if($update_status){
+				$delete_type = $this->Payments_model->delete($row);
+			}
+
+		}
+
+		$response = array(
+			'message' => 'Berhasil menghapus data',
+			'status'  => 'success'
+		);
+
+		output_json($response);
+	}
+
+	public function get_transaction()
+	{
+		$id              = $this->input->post('id');
+		$where           = array('id' => $id);
+		$data            = [];
+		$trasaction_data = $this->Checkin_model->get_data($where)->row();
+
+		$total_consumption = $this->Consumption_services_model->cs_detail_advance('*, sum(cs_detail_total) as total', array('transaction_id' => $id, 'cs_detail_item_type' => 'C'))->row()->total;
+		$total_service     = $this->Consumption_services_model->cs_detail_advance('*, sum(cs_detail_total) as total', array('transaction_id' => $id, 'cs_detail_item_type' => 'S'))->row()->total;
+
+		$total       = (($trasaction_data->total_price + $total_consumption + $total_service) - ($trasaction_data->discount + $trasaction_data->deposit));
+		// $tax         = $total * 0.10;
+		// $grand_total = $total + $tax;
+		$tax         = 0;
+		$grand_total = $total;
+
+		$response = [
+			'transaction_data'  => $trasaction_data,
+			'total_room'        => number_format($trasaction_data->total_price),
+			'discount'          => number_format($trasaction_data->discount),
+			'deposit'           => number_format($trasaction_data->deposit),
+			'total_consumption' => number_format($total_consumption),
+			'total_service'     => number_format($total_service),
+			'tax'               => $tax,
+			'grand_total'       => $grand_total
+		];
+
+		echo json_encode($response);
+	}
+
+}
+
+?>

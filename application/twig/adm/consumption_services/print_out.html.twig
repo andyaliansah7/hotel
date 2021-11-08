@@ -1,0 +1,240 @@
+{% extends 'adm/layout.html.twig' %}
+{% block add_css %}
+{{ parent() }}
+<style type="text/css">
+	@media print {
+		@page {
+			size: a4 portrait;
+		}
+
+		.table tbody tr td #cl-success{
+			-webkit-print-color-adjust:exact !important;
+			color-adjust: exact !important;  
+			print-color-adjust: exact !important;
+			background-color: #5cb85c !important;
+		}
+
+		.table tbody tr td #cl-danger{
+			-webkit-print-color-adjust:exact !important;
+			color-adjust: exact !important;  
+			print-color-adjust: exact !important;
+			background-color: #d9534f !important;
+		}
+
+		#cl-success{
+			background-color: #5cb85c !important;
+			color: white;
+		}
+
+		#cl-danger{
+			background-color: #d9534f !important;
+			color: white;
+		}
+	}
+
+	#cl-success{
+		background-color: #5cb85c !important;
+		color: white;
+	}
+
+	#cl-danger{
+		background-color: #d9534f !important;
+		color: white;
+	}
+
+	.wrap-header {
+
+	}
+
+	.wrap-footer {
+		page-break-inside: avoid;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="content-wrapper" id="vue-master">
+
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h4>{{ content_title }}</h4>
+				</div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item">Beranda</li>
+						<li class="breadcrumb-item">Transaksi</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+
+				<div class="col-md-12">
+
+					<div class="card card-default col-md-2 float-right">
+						<div class="card-body">
+							<button class="btn btn-success" style="width: 100%;" id="button-print">
+								<i class="fas fa-print"></i> &nbsp; Print
+							</button>
+						</div>
+					</div>
+
+					<div class="card card-default col-md-12">
+						<div class="card-body" id="master-content">
+
+							<div class="wrap-header">
+								<h2 align="left">Transaksi</h2>
+								
+									<table align="left" style="font-size: 14px; margin-top:.5%; width:35%;">
+										<tr>
+											<td class="text-bold">Nomor</td>
+											<td class="text-bold text-center" style="width: 10%;">:</td>
+											<td class="text-success text-bold">{{ check_array_key(header, 'consumption_service_header_number') }}</td>
+										<tr>
+										<tr>
+											<td class="text-bold">Tanggal</td>
+											<td class="text-bold text-center" style="width: 10%;">:</td>
+											<td>{{ indonesian_date(check_array_key(header, 'consumption_service_header_date')) }}</td>
+										<tr>
+										<tr>
+											<td class="text-bold">Supplier</td>
+											<td class="text-bold text-center" style="width: 10%;">:</td>
+											<td>{{ check_array_key(header, 'supplier_name') }}</td>
+										</tr>
+										<tr>
+											<td></td>
+											<td></td>
+											<td>
+												{{ check_array_key(header, 'supplier_address') }}
+											</td>
+										</tr>
+										<tr>
+											<td></td>
+											<td></td>
+											<td>
+												{{ check_array_key(header, 'supplier_telephone') }}
+											</td>
+										</tr>
+									</table>
+
+								
+									<table align="right" style="font-size: 14px; margin-top:1.5; width:35%;">
+										<tr>
+											<td class="text-bold" colspan="3">Tujuan :</td>
+										<tr>
+										<tr>
+											<td class="text-bold" colspan="3">{{ check_array_key(header, 'branch_name') }} ({{ check_array_key(header, 'warehouse_name') }})</td>
+										<tr>
+										<tr>
+											<td colspan="3">{{ check_array_key(header, 'branch_address') }}</td>
+										</tr>
+										<tr>
+											<td colspan="3">{{ check_array_key(header, 'branch_telephone') }}</td>
+										</tr>
+									</table>
+
+								<br/>
+								<br/>
+								<br/>
+								<table class="table" style="font-size: 14px; width:100%;">
+									<thead>
+										<tr>
+											<th class="fit-width">
+												No.
+											</th>
+											<th>
+												Kode
+											</th>
+											<th>
+												Nama Material
+											</th>
+											<th>
+												Quantity
+											</th>
+											<th>
+												Catatan
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% if detail %}
+											{% for row in detail %}
+											<tr>
+											<td class="fit-width">
+											{% set no = no + 1 %}
+											{{ no }}
+											</td>
+											<td>{{ row.material_code }}</td>
+											<td>{{ row.consumption_service_detail_material_name }}</td>
+											<td>{{ to_currency(row.consumption_service_detail_quantity) }} {{ row.unit_name }}</td>
+											<td>{{ row.consumption_service_detail_remark }}</td>
+											</tr>
+											{% endfor %}
+											{% endif %}
+									</tbody>
+									<tfoot>
+										<tr>
+											<td colspan="5">
+											<label>Keterangan : </label>
+												{{ check_array_key(header, 'consumption_service_header_description') }}
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+			<!-- /.row -->
+		</div><!-- /.container-fluid -->
+	</section>
+	<!-- /.content -->
+
+</div>
+
+{% endblock  %}
+
+{% block add_javascript %}
+{{ parent() }}
+
+<script type="text/javascript">
+	// $('[data-widget="pushmenu"]').PushMenu('toggle');
+
+	jQuery(function ($) {
+
+		// Function available at https://gist.github.com/sixlive/55b9630cc105676f842c
+
+		$.fn.printDiv = function () {
+			var printContents = $(this).html();
+			var originalContents = $('body').html();
+			$('body').html(printContents);
+			$('body').addClass('js-print');
+			window.print();
+			$('body').html(originalContents);
+			$('body').removeClass('js-print');
+		};
+
+		// Print
+		$('#button-print').click(function () {
+			$('#master-content').printDiv();
+			setTimeout(function () {
+				window.close()
+				location.reload();
+			}, 10);
+		});
+
+	});
+</script>
+
+{% endblock  %}
